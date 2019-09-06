@@ -1,0 +1,325 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of production_quality_IRF</title>
+  <meta name="keywords" content="production_quality_IRF">
+  <meta name="description" content="Produce &quot;production&quot; quality IRF plots from input data">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="../index.html">FISH_IF_colocalization</a> &gt; <a href="index.html">source_files</a> &gt; production_quality_IRF.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for FISH_IF_colocalization/source_files&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>production_quality_IRF
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Produce &quot;production&quot; quality IRF plots from input data</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function production_quality_IRF(FISH_IRF,IF_IRF,Random_IRF,ind_flag,figure_name,FISH_name,IF_name,FISH_color,IF_color) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">   Produce &quot;production&quot; quality IRF plots from input data
+   This function was broadly tweaked to generate the plots that were
+   eventually used for publication. The inputs are the IRF functions for
+   the FISH and IF, as well as random IF data. Various labels are input
+   parameters, and the color choice.
+   Figures are saved under figure_name</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../FISH_IF_colocalization/params.html" class="code" title="function params(directory_name,output_dir_name,in_params)">params</a>	Parametrizes input with typical image-analysis parameters</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function old_IRF(N_Image_store,N_Fish_store,N_random_IF,idf_name,IF_name,FISH_name,bg_subtract,max_multiplier)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function production_quality_IRF(FISH_IRF,IF_IRF,Random_IRF,ind_flag,figure_name,FISH_name,IF_name,FISH_color,IF_color)</a>
+0002 <span class="comment">%   Produce &quot;production&quot; quality IRF plots from input data</span>
+0003 <span class="comment">%   This function was broadly tweaked to generate the plots that were</span>
+0004 <span class="comment">%   eventually used for publication. The inputs are the IRF functions for</span>
+0005 <span class="comment">%   the FISH and IF, as well as random IF data. Various labels are input</span>
+0006 <span class="comment">%   parameters, and the color choice.</span>
+0007 <span class="comment">%   Figures are saved under figure_name</span>
+0008 input_params.xpixel = 0.0572;
+0009 
+0010 input_params.zpixel = 0.2;
+0011 
+0012 <span class="comment">% for i =1:1:length(FISH_data)</span>
+0013 <span class="comment">%     [FISH_IRF{i}] = convert_3D_image_IRF(FISH_data{i},input_params);</span>
+0014 <span class="comment">%     [IF_IRF{i}] = convert_3D_image_IRF(IF_data{i},input_params);</span>
+0015 <span class="comment">% end</span>
+0016 figure1=figure;
+0017 set(gcf, <span class="string">'Visible'</span>, <span class="string">'on'</span>);
+0018 green_color = [0 0.800000011920929 0.400000005960464];
+0019 magenta_color = [1 0 1];
+0020 red_color = [1 0 0];
+0021 set(figure1,<span class="string">'defaultAxesColorOrder'</span>,[FISH_color; IF_color]);
+0022 
+0023 subplot11 = subplot(1,1,1,<span class="string">'Parent'</span>,figure1);
+0024 set(subplot11,<span class="string">'defaultAxesColorOrder'</span>,[FISH_color; IF_color]);
+0025 
+0026 hold(subplot11,<span class="string">'on'</span>);
+0027 dist =[];
+0028 mean_FISH = [];
+0029 mean_IF =[];
+0030 yyaxis left
+0031 
+0032 <span class="keyword">for</span> k =1:1:length(FISH_IRF)
+0033     <span class="keyword">if</span> ind_flag
+0034         plot(smooth(FISH_IRF{k}.dist,15),smooth(FISH_IRF{k}.intensity,15),<span class="string">'LineWidth'</span>,0.25,<span class="string">'Color'</span>,FISH_color*0.5) ; hold on;
+0035     <span class="keyword">end</span>
+0036     mean_FISH = [mean_FISH smooth(FISH_IRF{k}.intensity,15)]; 
+0037 
+0038 <span class="keyword">end</span>
+0039 mean_FISH = mean(mean_FISH,2);
+0040 plot(smooth(FISH_IRF{k}.dist,15), mean_FISH,<span class="string">'LineWidth'</span>,4,<span class="string">'Color'</span>,FISH_color);
+0041 ylabel([FISH_name <span class="string">' FISH'</span>]);
+0042 
+0043 yyaxis right
+0044 <span class="keyword">for</span> k =1:1:length(FISH_IRF)
+0045     <span class="keyword">if</span> ind_flag
+0046         plot(smooth(FISH_IRF{k}.dist,15),smooth(IF_IRF{k}.intensity,15),<span class="string">'LineWidth'</span>,0.25,<span class="string">'Color'</span>,IF_color*0.5) ; hold on;
+0047     <span class="keyword">end</span>
+0048     mean_IF = [mean_IF smooth(IF_IRF{k}.intensity,15)]; 
+0049     
+0050 <span class="keyword">end</span>
+0051 mean_IF = mean(mean_IF,2);
+0052 p1=plot(smooth(FISH_IRF{k}.dist,15), mean_IF,<span class="string">'LineWidth'</span>,4,<span class="string">'Color'</span>,IF_color);
+0053 ylabel([IF_name <span class="string">' IF'</span>]);
+0054 set(subplot11,<span class="string">'FontSize'</span>,24);
+0055 
+0056 <span class="keyword">if</span> ~isempty(Random_IRF)
+0057     mean_R_IF = [];
+0058     yyaxis right
+0059     <span class="keyword">for</span> k =1:1:length(Random_IRF)
+0060         <span class="keyword">if</span> ind_flag
+0061             plot(smooth(Random_IRF{k}.dist,15),smooth(Random_IRF{k}.intensity,15),<span class="string">'LineWidth'</span>,0.25,<span class="string">'Color'</span>,IF_color*0.5,<span class="string">'LineStyle'</span>,<span class="string">'--'</span>) ; hold on;
+0062         <span class="keyword">end</span>
+0063         mean_R_IF = [mean_R_IF smooth(Random_IRF{k}.intensity,15)]; 
+0064 
+0065     <span class="keyword">end</span>
+0066     mean_R_IF = mean(mean_R_IF,2);
+0067     p2=plot(smooth(Random_IRF{k}.dist,15), mean_R_IF,<span class="string">'LineWidth'</span>,4,<span class="string">'Color'</span>,IF_color*0.4,<span class="string">'LineStyle'</span>,<span class="string">'--'</span>);
+0068     C1 =corrcoef(mean_FISH,mean_IF);
+0069 
+0070     legend([p1,p2],{[<span class="string">'\rho = '</span> num2str(C1(1,2),2) <span class="string">' N_{foci} = '</span> num2str(length(FISH_IRF))],[IF_name <span class="string">'Random IF'</span>]});
+0071     set(subplot11,<span class="string">'FontSize'</span>,24);
+0072 <span class="keyword">else</span>
+0073     C1 =corrcoef(mean_FISH,mean_IF);
+0074 
+0075   legend([p1],{[<span class="string">'\rho = '</span> num2str(C1(1,2),2) <span class="string">' N_{foci} = '</span> num2str(length(FISH_IRF))]});
+0076 
+0077 <span class="keyword">end</span>
+0078 set(gcf, <span class="string">'Position'</span>, get(0, <span class="string">'Screensize'</span>));
+0079 xlabel(<span class="string">'\mum'</span>);
+0080 
+0081 saveas(gcf,[figure_name <span class="string">'.fig'</span>]);
+0082 saveas(gcf,[figure_name <span class="string">'.svg'</span>]);
+0083 
+0084 <span class="comment">%</span>
+0085 <span class="comment">%</span>
+0086 <span class="comment">%</span>
+0087 <span class="comment">%</span>
+0088 <span class="comment">%</span>
+0089 
+0090 
+0091 
+0092 
+0093 
+0094 
+0095 
+0096 
+0097 
+0098 
+0099 
+0100 
+0101 
+0102 <span class="keyword">end</span>
+0103 
+0104 <a name="_sub1" href="#_subfunctions" class="code">function old_IRF(N_Image_store,N_Fish_store,N_random_IF,idf_name,IF_name,FISH_name,bg_subtract,max_multiplier)</a>
+0105 
+0106 <span class="comment">% close all;</span>
+0107 
+0108 
+0109 pixel_to_micron = 1/0.0572;
+0110 
+0111 
+0112 <span class="comment">%% Generate data and plot for each trajectory</span>
+0113 
+0114 center_point = [ceil(size(N_Image_store,2)/2),ceil(size(N_Image_store,2)/2)];
+0115 dist_FISH = [];
+0116 count =1;
+0117 temp_store_FISH = [];
+0118 temp_store_IF = [];
+0119 
+0120 
+0121 temp_store_normalized_FISH = [];
+0122 temp_store_normalized_IF = [];
+0123 
+0124 
+0125 
+0126 figure1=figure;
+0127 <span class="comment">% set(gcf, 'Visible', 'off');</span>
+0128 
+0129 <span class="comment">%% Generate for the average plots</span>
+0130 count =1;
+0131 <span class="keyword">if</span> ~bg_subtract
+0132     average_protein = mean(N_Image_store,3);
+0133     average_FISH = mean(N_Fish_store,3);
+0134     average_random_protein = mean(N_random_IF,3);
+0135 <span class="keyword">else</span>
+0136     average_FISH = mean(N_Fish_store,3);
+0137     average_protein = mean(N_Image_store,3) - mean(mean(mean(N_random_IF,3)));
+0138     average_random_protein = mean(N_random_IF,3)- mean(mean(mean(N_random_IF,3)));
+0139 
+0140 <span class="keyword">end</span>
+0141 dist_max = 0.5*max_multiplier*size(average_FISH,2)/pixel_to_micron;
+0142 
+0143 <span class="keyword">for</span> i =1:1:size(average_FISH,1)
+0144     <span class="keyword">for</span> j=1:1:size(average_FISH,2)
+0145         dist_FISH(count)= sqrt((i-center_point(1))^2+(j-center_point(2))^2)/pixel_to_micron;
+0146         <span class="keyword">if</span> dist_FISH(count)&lt;dist_max
+0147             Intensity_FISH(count) = average_FISH(i,j);
+0148             Intensity_protein(count) = average_protein(i,j);
+0149             Intensity_random_protein(count) = average_random_protein(i,j);
+0150             count = count+1;
+0151         <span class="keyword">else</span>
+0152             dist_FISH(count) = [];        
+0153         <span class="keyword">end</span>
+0154        
+0155     <span class="keyword">end</span>
+0156 <span class="keyword">end</span>
+0157 [sort_dist_FISH,index_sort]=sort(dist_FISH);
+0158 [sort_Intensity_FISH] = Intensity_FISH(index_sort);
+0159 [sort_Intensity_protein] = Intensity_protein(index_sort);
+0160 [sort_Intensity_random_protein] = Intensity_random_protein(index_sort);
+0161 
+0162 
+0163 Normalized_by_mean_FISH = sort_Intensity_FISH/ mean(sort_Intensity_FISH);
+0164 Normalized_by_mean_protein = sort_Intensity_protein/ mean(sort_Intensity_protein);
+0165 Normalized_by_mean_random_protein = sort_Intensity_random_protein/ mean(sort_Intensity_protein);
+0166 
+0167 d= 1;
+0168 <span class="keyword">while</span>(d &lt;= length(sort_dist_FISH))
+0169     repeats = find(sort_dist_FISH== sort_dist_FISH(d));
+0170     <span class="keyword">if</span> length(repeats)~=1
+0171         sort_dist_FISH(repeats) = [];
+0172         sort_Intensity_FISH(d) = mean(sort_Intensity_FISH([d, repeats]));
+0173         Normalized_by_mean_FISH(d) = mean(Normalized_by_mean_FISH([d, repeats]));
+0174 
+0175         
+0176         sort_Intensity_protein(d) = mean(sort_Intensity_protein([d, repeats]));
+0177         Normalized_by_mean_protein(d) = mean(Normalized_by_mean_protein([d, repeats]));
+0178 
+0179         sort_Intensity_random_protein(d) = mean(sort_Intensity_random_protein([d, repeats]));
+0180         Normalized_by_mean_random_protein(d) = mean(Normalized_by_mean_random_protein([d, repeats]));
+0181 
+0182         
+0183         sort_Intensity_FISH(repeats) = [];
+0184         Normalized_by_mean_FISH(repeats) = [];
+0185        
+0186         
+0187         sort_Intensity_protein(repeats) = [];
+0188         Normalized_by_mean_protein(repeats) = [];
+0189        
+0190         sort_Intensity_random_protein(repeats) = [];
+0191         Normalized_by_mean_random_protein(repeats) = [];
+0192 
+0193 
+0194     <span class="keyword">end</span>
+0195     d=d+1;
+0196 <span class="keyword">end</span>
+0197 
+0198 C1 =corrcoef(sort_Intensity_FISH,sort_Intensity_protein);
+0199 C2 =corrcoef(sort_Intensity_FISH,sort_Intensity_random_protein);
+0200 disp([<span class="string">'Correlation coefficient for FISH and IF is'</span> num2str(C1(1,2))]);    
+0201 disp([<span class="string">'Correlation coefficient for FISH and random IF is'</span> num2str(C2(1,2))]);    
+0202 
+0203 green_color = [0 0.800000011920929 0.400000005960464];
+0204 magenta_color = [1 0 1];
+0205 set(figure1,<span class="string">'defaultAxesColorOrder'</span>,[magenta_color; green_color]);
+0206 
+0207 subplot11 = subplot(2,1,1,<span class="string">'Parent'</span>,figure1);
+0208 set(subplot11,<span class="string">'defaultAxesColorOrder'</span>,[magenta_color; green_color]);
+0209 
+0210 hold(subplot11,<span class="string">'on'</span>);
+0211 
+0212 <span class="comment">% Create multiple lines using matrix input to plot</span>
+0213 yyaxis left
+0214 plot(smooth(sort_dist_FISH,5),smooth(sort_Intensity_FISH,5),<span class="string">'LineWidth'</span>,4,<span class="string">'Color'</span>,magenta_color); hold on;
+0215 ylim([min(smooth(sort_Intensity_FISH,5)) max(smooth(sort_Intensity_FISH,5))]);
+0216 ylabel([FISH_name <span class="string">' FISH'</span>]);
+0217 
+0218 yyaxis right
+0219 plot(smooth(sort_dist_FISH,5),smooth(sort_Intensity_protein,5),<span class="string">'LineWidth'</span>,4,<span class="string">'Color'</span>,green_color); hold on;
+0220 plot(smooth(sort_dist_FISH,5),smooth(sort_Intensity_random_protein,5),<span class="string">'LineWidth'</span>,4,<span class="string">'LineStyle'</span>,<span class="string">':'</span>,<span class="string">'Color'</span>,green_color); hold on;
+0221 ylim([min(min(smooth(sort_Intensity_random_protein,5)),min(smooth(sort_Intensity_protein,5))) max(max(smooth(sort_Intensity_protein,5)),max(smooth(sort_Intensity_random_protein,5)))]);
+0222 ylabel([IF_name <span class="string">' IF'</span>]);
+0223 
+0224 <span class="comment">% Create xlabel</span>
+0225 xlabel(<span class="string">'\mum'</span>);
+0226 xlim([0 dist_max]);
+0227 
+0228 <span class="comment">% Create ylabel</span>
+0229 <span class="comment">%     ylim([0 1])</span>
+0230 box(subplot11,<span class="string">'on'</span>);
+0231 <span class="comment">% Set the remaining axes properties</span>
+0232 set(subplot11,<span class="string">'FontSize'</span>,24);
+0233 
+0234 subplot12 = subplot(2,1,2,<span class="string">'Parent'</span>,figure1);
+0235 set(subplot12,<span class="string">'defaultAxesColorOrder'</span>,[magenta_color; green_color]);
+0236 
+0237 hold(subplot12,<span class="string">'on'</span>);
+0238 pixel_to_micron = 1/0.0572;
+0239 
+0240 <span class="comment">% Create multiple lines using matrix input to plot</span>
+0241 yyaxis left
+0242 
+0243 plot(smooth(sort_dist_FISH,5),smooth(Normalized_by_mean_FISH,5),<span class="string">'LineWidth'</span>,4,<span class="string">'Color'</span>,magenta_color); hold on;
+0244 ylim([min(smooth(Normalized_by_mean_FISH,5)) max(smooth(Normalized_by_mean_FISH,5))]);
+0245 ylabel([FISH_name <span class="string">' FISH (Normalized)'</span>]);
+0246 
+0247 yyaxis right
+0248 plot(smooth(sort_dist_FISH,5),smooth(Normalized_by_mean_protein,5),<span class="string">'LineWidth'</span>,4,<span class="string">'Color'</span>,green_color);
+0249 plot(smooth(sort_dist_FISH,5),smooth(Normalized_by_mean_random_protein,5),<span class="string">'LineWidth'</span>,4,<span class="string">'LineStyle'</span>,<span class="string">':'</span>,<span class="string">'Color'</span>,green_color); hold on;
+0250 ylim([min(min(smooth(Normalized_by_mean_random_protein,5)),min(smooth(Normalized_by_mean_protein,5))) max(max(smooth(Normalized_by_mean_protein,5)),max(smooth(Normalized_by_mean_random_protein,5)))]);
+0251 ylabel([IF_name <span class="string">' IF (Normalized)'</span>]);
+0252 
+0253 <span class="comment">% Create xlabel</span>
+0254 xlabel(<span class="string">'\mum'</span>);
+0255 xlim([0 dist_max]);
+0256 
+0257 <span class="comment">% Create ylabel</span>
+0258 <span class="comment">%     ylim([0 1])</span>
+0259 box(subplot12,<span class="string">'on'</span>);
+0260 <span class="comment">% Set the remaining axes properties</span>
+0261 set(subplot12,<span class="string">'FontSize'</span>,24);
+0262 
+0263 
+0264 
+0265 
+0266 set(gcf, <span class="string">'Position'</span>, get(0, <span class="string">'Screensize'</span>));
+0267 
+0268 <span class="comment">% saveas(gcf,[idf_name],'fig');</span>
+0269 saveas(gcf,[idf_name <span class="string">'.svg'</span>],<span class="string">'svg'</span>);
+0270 
+0271 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 11-Mar-2019 16:08:27 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of generate_average_images</title>
+  <meta name="keywords" content="generate_average_images">
+  <meta name="description" content="Generates average projection FISH/IF plots">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="../index.html">FISH_IF_colocalization</a> &gt; <a href="index.html">source_files</a> &gt; generate_average_images.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for FISH_IF_colocalization/source_files&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>generate_average_images
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Generates average projection FISH/IF plots</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [Rand_protein,Rand_IF] = generate_average_images(Image_store,Fish_store,figure_name,IF_name,FISH_name) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Generates average projection FISH/IF plots
+   Function takes in FISH, IF IRF image matrices, as well as data names.
+   The figure is saved under figure_name
+   Rand_protein and Rand_IF are just randomized permutations of the input
+   matrix that are one possible control</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="generate_random_foci_data.html" class="code" title="function generate_random_foci_data(directory_name,output_dir_name,random_nuclear_foci,input_params)">generate_random_foci_data</a>	Function that reads in FISH, IF, and random nuclear spot files to generate output centered on</li><li><a href="slices_of_relevant_images.html" class="code" title="function slices_of_relevant_images(directory_name,output_dir_name,input_params)">slices_of_relevant_images</a>	Function that reads in FISH and IF files to generate output centered on</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [Rand_protein,Rand_IF] = generate_average_images(Image_store,Fish_store,figure_name,IF_name,FISH_name)</a>
+0002 <span class="comment">% Generates average projection FISH/IF plots</span>
+0003 <span class="comment">%   Function takes in FISH, IF IRF image matrices, as well as data names.</span>
+0004 <span class="comment">%   The figure is saved under figure_name</span>
+0005 <span class="comment">%   Rand_protein and Rand_IF are just randomized permutations of the input</span>
+0006 <span class="comment">%   matrix that are one possible control</span>
+0007 
+0008 close all;
+0009 IF_proc = [];
+0010 FISH_proc = [];
+0011 <span class="keyword">for</span> i=1:1:length(Fish_store)
+0012     IF_proc(:,:,i) = mean(Image_store{i},3);
+0013     FISH_proc(:,:,i) = mean(Fish_store{i},3);
+0014 <span class="keyword">end</span>
+0015 average_FISH = mean(FISH_proc,3);
+0016 average_protein = mean(IF_proc,3);
+0017 
+0018 <span class="keyword">for</span> j=1:1:size(IF_proc,3)
+0019    Temp_image = IF_proc(:,:,j);
+0020    Rand_protein(:,:,j) = reshape(Temp_image(randperm(numel(Temp_image))),length(Temp_image),length(Temp_image));
+0021    Temp_image = FISH_proc(:,:,j);
+0022    Rand_IF(:,:,j) = reshape(Temp_image(randperm(numel(Temp_image))),length(Temp_image),length(Temp_image));
+0023 
+0024 <span class="keyword">end</span>
+0025 Rand_mean = mean(Rand_protein,3);
+0026 protein_color_map = [0 0.05 0;0 0.1 0; 0 0.15 0; 0 0.2 0;0 0.5 0;0 0.6 0;0 0.7 0;0 0.8 0;];
+0027 <span class="comment">% FISH_color_map = [0.05 0 0;0.1 0 0; 0.15 0 0 ; 0.2 0 0 ;0.5 0 0 ;0.6 0 0 ;0.7 0 0 ;0.8 0 0 ;];</span>
+0028 
+0029 n_colors = 16;
+0030 FISH_color_map = zeros(n_colors,3);
+0031 FISH_color_map(:,1) = linspace(0,1,n_colors);
+0032 
+0033 
+0034 n_colors = 6;
+0035 
+0036 protein_color_map = zeros(n_colors,3);
+0037 protein_color_map(:,2) = linspace(0,1,n_colors);
+0038 
+0039 
+0040 figure;
+0041 set(gcf, <span class="string">'Visible'</span>, <span class="string">'on'</span>);
+0042 
+0043 
+0044 ax1= subplot(2,2,1);
+0045 
+0046 [Cf,hf]=contourf(average_FISH);
+0047 colormap(ax1,FISH_color_map); hold on;
+0048 hf.LineStyle=<span class="string">'none'</span>;
+0049 <span class="comment">% hf.LevelStep =30;</span>
+0050 title([FISH_name <span class="string">' FISH'</span>],<span class="string">'FontSize'</span>,16);
+0051 pbaspect([1 1 1]);
+0052 
+0053 ax2 = subplot(2,2,2);
+0054 surf(average_FISH); hold on;
+0055 view(ax2,[298.1 26]);
+0056 colormap(ax2,FISH_color_map);
+0057 title([FISH_name <span class="string">' FISH intensity'</span>],<span class="string">'FontSize'</span>,16);
+0058 colorbar
+0059 pbaspect([3 3 2]);
+0060 
+0061 <span class="comment">% colormap default</span>
+0062 ax3=subplot(2,2,3);
+0063 [C,h]=contourf(average_protein); hold on;
+0064 h.LineStyle =<span class="string">'none'</span>;
+0065 <span class="comment">% h.LevelStep =15;</span>
+0066 colormap(ax3,protein_color_map); 
+0067 title([IF_name <span class="string">' IF'</span>],<span class="string">'FontSize'</span>,16);
+0068 pbaspect([1 1 1]);
+0069 
+0070 ax4=subplot(2,2,4);
+0071 surf(average_protein); hold on;
+0072 view(ax4,[298.1 26]);
+0073 title([IF_name <span class="string">' IF Intensity'</span>],<span class="string">'FontSize'</span>,16);
+0074 colormap(ax4,protein_color_map); 
+0075 colorbar
+0076 pbaspect([3 3 2]);
+0077 
+0078 
+0079 <span class="comment">% ax5=subplot(3,2,5);</span>
+0080 <span class="comment">% [Cr,hr]=contourf(Rand_mean); hold on;</span>
+0081 <span class="comment">% hr.LevelList = h.LevelList;</span>
+0082 <span class="comment">% hr.LineStyle ='none';</span>
+0083 <span class="comment">% colormap(ax5,protein_color_map);</span>
+0084 <span class="comment">% title('Randomized IF','FontSize',16);</span>
+0085 <span class="comment">%</span>
+0086 <span class="comment">% % hr.LevelStep =20;</span>
+0087 <span class="comment">%</span>
+0088 <span class="comment">%</span>
+0089 <span class="comment">% ax6 =subplot(3,2,6);</span>
+0090 <span class="comment">% surf(Rand_mean); hold on;</span>
+0091 <span class="comment">% colormap(protein_color_map);</span>
+0092 <span class="comment">% view(ax6,[298.1 26]);</span>
+0093 <span class="comment">% title('Randomized IF intensity','FontSize',16);</span>
+0094 <span class="comment">% colorbar</span>
+0095 
+0096 set(gcf, <span class="string">'Position'</span>, get(0, <span class="string">'Screensize'</span>));
+0097 <span class="comment">%</span>
+0098 <span class="comment">% saveas(gcf,[figure_name '.fig']);</span>
+0099 <span class="comment">% saveas(gcf,[figure_name '.svg']);</span>
+0100 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 11-Mar-2019 16:08:27 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

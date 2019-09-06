@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of generate_production_plots</title>
+  <meta name="keywords" content="generate_production_plots">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">FISH_IF_colocalization</a> &gt; generate_production_plots.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for FISH_IF_colocalization&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>generate_production_plots
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function generate_production_plots(output_dir_name,out_name,thresh,intens_thresh) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="../FISH_IF_colocalization/source_files/production_average_images.html" class="code" title="function production_average_images(Image_store,Fish_store,Random_store,figure_name,IF_name,FISH_name,FISH_color,IF_color,stack_range)">production_average_images</a>	Produce "production" quality FISH-IF plots from input data</li><li><a href="../FISH_IF_colocalization/source_files/production_quality_IRF.html" class="code" title="function production_quality_IRF(FISH_IRF,IF_IRF,Random_IRF,ind_flag,figure_name,FISH_name,IF_name,FISH_color,IF_color)">production_quality_IRF</a>	Produce "production" quality IRF plots from input data</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function generate_production_plots(output_dir_name,out_name,thresh,intens_thresh)</a>
+0002 addpath(<span class="string">'source_files/'</span>);
+0003 
+0004 output_random_dir_name = [output_dir_name <span class="string">'_random'</span>];
+0005 real_data_loc = [output_dir_name  <span class="string">'/Combined_data/Total_data.mat'</span>];
+0006 
+0007 list_of_files = dir([output_dir_name <span class="string">'/Combined_data/'</span>]);
+0008 <span class="keyword">for</span> file=3:1:length(list_of_files)
+0009     <span class="keyword">if</span> strfind(list_of_files(file).name,<span class="string">'.csv'</span>)
+0010         csv_file = readtable([output_dir_name <span class="string">'/Combined_data/'</span> list_of_files(file).name])
+0011     <span class="keyword">end</span>
+0012 <span class="keyword">end</span>
+0013 <span class="comment">%   Saves important foci statistics</span>
+0014 <span class="comment">%   save_foci_data_post_analysis(real_data_loc,input_params);</span>
+0015 
+0016 FISH_color = [1 0 0];
+0017 IF_color = [0 1 0];
+0018 RD_all = load(real_data_loc);
+0019 N_all = length(RD_all.COM_data(:,4));
+0020 count = 1;
+0021 RD = [];
+0022 RD.FISH_data = {};
+0023 RD.IF_data = {};
+0024 RD.FISH_IRF = {};
+0025 RD.IF_IRF = {};
+0026 RD.COM_data = [];
+0027 csv_processed = {};
+0028 <span class="keyword">for</span> i=1:1:N_all
+0029     <span class="keyword">if</span> ((RD_all.COM_data(i,4) &gt; thresh) &amp;&amp; (table2array(csv_file(i,4)) &gt; intens_thresh))
+0030         RD.FISH_data{count} = RD_all.FISH_data{i};
+0031         
+0032         RD.IF_data{count} = RD_all.IF_data{i};
+0033         RD.FISH_IRF{count} = RD_all.FISH_IRF{i};
+0034         RD.IF_IRF{count} = RD_all.IF_IRF{i};
+0035         RD.COM_data(count,:) = RD_all.COM_data(i,:);
+0036         csv_processed{count} = table2cell(csv_file(i,:));
+0037         count= count+1;
+0038     <span class="keyword">end</span>
+0039 <span class="keyword">end</span>
+0040 a = cell2table(csv_processed');
+0041 a.Properties.VariableNames = {<span class="string">'Xc_Yc_Zc_FISH_IF_Image'</span>};
+0042 
+0043 input_params =RD_all.input_params;
+0044 z_stack_center = ceil(size(RD.FISH_data{1},3)/2);
+0045 mkdir([fileparts(real_data_loc) <span class="string">'/'</span>  out_name])
+0046 name = [fileparts(real_data_loc) <span class="string">'/'</span>  out_name <span class="string">'/'</span>  input_params.FISH_name <span class="string">'_'</span> input_params.IF_name <span class="string">'_production_average_image_vol_'</span> num2str(thresh) <span class="string">'_int_'</span> num2str(intens_thresh) ];
+0047 figure_name = [fileparts(real_data_loc) <span class="string">'/'</span> out_name <span class="string">'/'</span>  input_params.FISH_name <span class="string">'_'</span> input_params.IF_name <span class="string">'_production_IRF_image_vol_'</span> num2str(thresh) <span class="string">'_int_'</span> num2str(intens_thresh)];
+0048 random_data_loc = [ output_random_dir_name  <span class="string">'/Combined_data/Total_data.mat'</span>];
+0049 writetable(a,[fileparts(real_data_loc) <span class="string">'/'</span> out_name <span class="string">'/'</span> input_params.FISH_name <span class="string">'_'</span> input_params.IF_name <span class="string">'_foci_statistics_vol_'</span> num2str(thresh) <span class="string">'_int_'</span> num2str(intens_thresh) <span class="string">'.csv'</span>])
+0050 Random_store =load(random_data_loc);
+0051 <a href="../FISH_IF_colocalization/source_files/production_average_images.html" class="code" title="function production_average_images(Image_store,Fish_store,Random_store,figure_name,IF_name,FISH_name,FISH_color,IF_color,stack_range)">production_average_images</a>(RD.IF_data,RD.FISH_data,Random_store.IF_data,name,input_params.IF_name,input_params.FISH_name,FISH_color,IF_color,[z_stack_center-2,z_stack_center+2])
+0052 <a href="../FISH_IF_colocalization/source_files/production_quality_IRF.html" class="code" title="function production_quality_IRF(FISH_IRF,IF_IRF,Random_IRF,ind_flag,figure_name,FISH_name,IF_name,FISH_color,IF_color)">production_quality_IRF</a>(RD.FISH_IRF,RD.IF_IRF,Random_store.IF_IRF,0,figure_name,input_params.FISH_name,input_params.IF_name,FISH_color,IF_color)
+0053 
+0054 
+0055 
+0056 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 11-Mar-2019 16:05:25 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

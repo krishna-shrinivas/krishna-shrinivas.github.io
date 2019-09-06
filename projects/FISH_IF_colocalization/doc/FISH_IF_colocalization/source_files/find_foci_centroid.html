@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of find_foci_centroid</title>
+  <meta name="keywords" content="find_foci_centroid">
+  <meta name="description" content="Function takes in FISH data and performs registration/thresholding across">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="../index.html">FISH_IF_colocalization</a> &gt; <a href="index.html">source_files</a> &gt; find_foci_centroid.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for FISH_IF_colocalization/source_files&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>find_foci_centroid
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Function takes in FISH data and performs registration/thresholding across</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [COM]= find_foci_centroid(Fish_store,IF_store,stats_relevant,input_params) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">   Function takes in FISH data and performs registration/thresholding across
+   the z-stacks to identify COM for each foci</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="slices_of_relevant_images.html" class="code" title="function slices_of_relevant_images(directory_name,output_dir_name,input_params)">slices_of_relevant_images</a>	Function that reads in FISH and IF files to generate output centered on</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [COM]= find_foci_centroid(Fish_store,IF_store,stats_relevant,input_params)</a>
+0002 <span class="comment">%   Function takes in FISH data and performs registration/thresholding across</span>
+0003 <span class="comment">%   the z-stacks to identify COM for each foci</span>
+0004 
+0005 N_Fish_store = Fish_store;
+0006 N_Image_store = IF_store;
+0007 N_stats = stats_relevant(:,1:5);
+0008 
+0009 
+0010 zthreshold = 10;
+0011 xythreshold = 10;
+0012 
+0013 xpixel = input_params.xpixel;
+0014 zpixel = input_params.zpixel;
+0015 
+0016 foci =1;
+0017 <span class="keyword">while</span> (foci&lt;= size(N_stats,1))
+0018     COM = N_stats(foci,1:2);
+0019     stack = N_stats(foci,3);
+0020     store_to_remove = [];
+0021     
+0022     <span class="keyword">for</span> j=foci+1:1:size(N_stats,1)
+0023         dist = sqrt ( sum((COM(1,1:2)- N_stats(j,1:2)).^2));
+0024         <span class="keyword">if</span> (dist &lt; xythreshold) &amp;&amp; ( N_stats(j,3)-stack &lt;=zthreshold)
+0025             store_to_remove = [store_to_remove j];
+0026         <span class="keyword">end</span>
+0027     <span class="keyword">end</span>
+0028     
+0029     
+0030     <span class="keyword">if</span> (COM(1)&gt;1000) &amp;&amp; (COM(2)&gt;1000)
+0031         N_stats(foci,:) = [];
+0032         N_Fish_store(:,:,foci) = [];
+0033         N_Image_store(:,:,foci) = [];
+0034         
+0035     <span class="keyword">else</span>
+0036         N_stats(foci,1) = sum(N_stats([foci store_to_remove],1).*N_stats([foci store_to_remove],4))/sum(N_stats([foci store_to_remove],4));
+0037         N_stats(foci,2) = sum(N_stats([foci store_to_remove],2).*N_stats([foci store_to_remove],4))/sum(N_stats([foci store_to_remove],4));
+0038         N_stats(foci,3) = sum(N_stats([foci store_to_remove],3).*N_stats([foci store_to_remove],4))/sum(N_stats([foci store_to_remove],4));
+0039         N_stats(foci,5) = sum(N_stats([foci store_to_remove],4) .* N_stats([foci store_to_remove],5))/sum(N_stats([foci store_to_remove],4));
+0040         N_stats(foci,4) = sum(N_stats([foci store_to_remove],4));
+0041         
+0042         N_Fish_store(:,:,foci) = mean(N_Fish_store(:,:,[foci store_to_remove]),3);
+0043         N_Image_store(:,:,foci) = mean(N_Image_store(:,:,[foci store_to_remove]),3);
+0044         
+0045         N_stats(store_to_remove,:) = [];
+0046         N_Fish_store(:,:,store_to_remove) = [];
+0047         N_Image_store(:,:,store_to_remove) = [];
+0048         foci = foci+1;
+0049         
+0050     <span class="keyword">end</span>
+0051     
+0052 <span class="keyword">end</span>
+0053 
+0054 
+0055 
+0056 N_stats(:,6:7) = N_stats(:,1:2)*xpixel;
+0057 N_stats(:,8) = N_stats(:,3)*zpixel;
+0058 N_stats(:,9) =N_stats(:,4)*(xpixel*xpixel)*zpixel;
+0059 
+0060 volume_threshold = input_params.volume_threshold;
+0061 foci =1;
+0062 <span class="keyword">while</span> (foci&lt;= size(N_stats,1))
+0063     
+0064     Vol_cur = N_stats(foci,9);
+0065     <span class="keyword">if</span> Vol_cur &lt; volume_threshold
+0066         N_stats(foci,:) = [];
+0067         N_Fish_store(:,:,foci) = [];
+0068         N_Image_store(:,:,foci) = [];
+0069         foci= foci-1;
+0070     <span class="keyword">end</span>
+0071     foci= foci+1;
+0072 <span class="keyword">end</span>
+0073 
+0074 
+0075 
+0076 COM = [];
+0077 COM(:,1:3) = N_stats(:,1:3);
+0078 
+0079 <span class="comment">%Volume of bodies</span>
+0080 COM(:,4) = N_stats(:,9);
+0081 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 11-Mar-2019 16:08:27 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

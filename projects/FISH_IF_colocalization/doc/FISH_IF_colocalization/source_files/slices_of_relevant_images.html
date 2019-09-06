@@ -1,0 +1,347 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of slices_of_relevant_images</title>
+  <meta name="keywords" content="slices_of_relevant_images">
+  <meta name="description" content="Function that reads in FISH and IF files to generate output centered on">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="../index.html">FISH_IF_colocalization</a> &gt; <a href="index.html">source_files</a> &gt; slices_of_relevant_images.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for FISH_IF_colocalization/source_files&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>slices_of_relevant_images
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Function that reads in FISH and IF files to generate output centered on</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function slices_of_relevant_images(directory_name,output_dir_name,input_params) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Function that reads in FISH and IF files to generate output centered on
+ on various FISH foci and saves all the captured foci, as well as the IF
+ information in all the stacks for any given FISH foci
+
+   The various parameters are
+
+       directory_name ==   directory under which the files are stored under
+                           with each replicate under a different subfolder
+
+       flag == 1 if passed FISH area &amp; intensity threshold is used
+              0 if default threshold of 8 pixel^2, 2.1 multiplier is used
+
+       threshold_multiplier == passed intensity multiplier threshold
+
+       FISH_threshold == passed FISH area threshold
+
+       output_dir_name ==  directory to which output files are written
+                           In particular, the there will be a separate
+                           subfolder for each replicate and one labeled
+                           'Combined_data' with all data together. Within
+                           each replicate folder, there will be many
+                           sub-folders:
+                               Data - Foci calls and MATLAB data
+                               Images_offset_x -  Average images z-offset by
+                                                  x slices b/w FISH &amp; IF
+                               IRF_offset_x -     IRF of average images
+                                                  with _av_0 for &lt;IRF&gt; and
+                                                  _av_1 IRF of &lt;image&gt;</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="convert_3D_image_IRF.html" class="code" title="function [IRF] = convert_3D_image_IRF(Data,input_params)">convert_3D_image_IRF</a>	Converts 3D matrix of image data into a 1D radial function about centroid</li><li><a href="curate_foci_COM.html" class="code" title="function [COM] = curate_foci_COM(curated_foci_csv,COM,input_params)">curate_foci_COM</a>	Function that curates auto-called foci vs manually called foci</li><li><a href="find_foci_centroid.html" class="code" title="function [COM]= find_foci_centroid(Fish_store,IF_store,stats_relevant,input_params)">find_foci_centroid</a>	Function takes in FISH data and performs registration/thresholding across</li><li><a href="generate_IRF_collapse_plot.html" class="code" title="function generate_IRF_collapse_plot(FISH_IRF,IF_IRF,ind_flag,figure_name)">generate_IRF_collapse_plot</a>	Generates IRF plots</li><li><a href="generate_average_images.html" class="code" title="function [Rand_protein,Rand_IF] = generate_average_images(Image_store,Fish_store,figure_name,IF_name,FISH_name)">generate_average_images</a>	Generates average projection FISH/IF plots</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../FISH_IF_colocalization/params.html" class="code" title="function params(directory_name,output_dir_name,in_params)">params</a>	Parametrizes input with typical image-analysis parameters</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% Function that reads in FISH and IF files to generate output centered on</span>
+0002 <span class="comment">% on various FISH foci and saves all the captured foci, as well as the IF</span>
+0003 <span class="comment">% information in all the stacks for any given FISH foci</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%   The various parameters are</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%       directory_name ==   directory under which the files are stored under</span>
+0008 <span class="comment">%                           with each replicate under a different subfolder</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%       flag == 1 if passed FISH area &amp; intensity threshold is used</span>
+0011 <span class="comment">%              0 if default threshold of 8 pixel^2, 2.1 multiplier is used</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%       threshold_multiplier == passed intensity multiplier threshold</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">%       FISH_threshold == passed FISH area threshold</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">%       output_dir_name ==  directory to which output files are written</span>
+0018 <span class="comment">%                           In particular, the there will be a separate</span>
+0019 <span class="comment">%                           subfolder for each replicate and one labeled</span>
+0020 <span class="comment">%                           'Combined_data' with all data together. Within</span>
+0021 <span class="comment">%                           each replicate folder, there will be many</span>
+0022 <span class="comment">%                           sub-folders:</span>
+0023 <span class="comment">%                               Data - Foci calls and MATLAB data</span>
+0024 <span class="comment">%                               Images_offset_x -  Average images z-offset by</span>
+0025 <span class="comment">%                                                  x slices b/w FISH &amp; IF</span>
+0026 <span class="comment">%                               IRF_offset_x -     IRF of average images</span>
+0027 <span class="comment">%                                                  with _av_0 for &lt;IRF&gt; and</span>
+0028 <span class="comment">%                                                  _av_1 IRF of &lt;image&gt;</span>
+0029 <span class="comment">%</span>
+0030 <span class="comment">%</span>
+0031 
+0032 <a name="_sub0" href="#_subfunctions" class="code">function slices_of_relevant_images(directory_name,output_dir_name,input_params)</a>
+0033 
+0034 
+0035 <span class="comment">%Lists all sub-directories in the images folder which</span>
+0036 <span class="comment">% are characterise as Expt_no_1/Image_1, Expt_no/Image_2</span>
+0037 p=dir(directory_name);
+0038 subdir = {};
+0039 
+0040 FISH_data = {};
+0041 IF_data = {};
+0042 COM_data = [];
+0043 
+0044 <span class="comment">%Pixel parameters</span>
+0045 xpixel = input_params.xpixel;
+0046 zpixel = input_params.zpixel;
+0047 
+0048 <span class="comment">%   Stores IF and FISH information different cells</span>
+0049 <span class="comment">%   for each separate replicate</span>
+0050 
+0051 count = 1;
+0052 <span class="keyword">for</span> i=3:1:length(p)
+0053     
+0054     
+0055     subdir{i-2} = [directory_name p(i).name <span class="string">'/'</span>];
+0056     <span class="keyword">if</span> (isdir(subdir{i-2}) &amp;&amp; isempty(strfind(subdir{i-2},<span class="string">'.'</span>)))
+0057         
+0058         local_files  = dir(subdir{i-2});
+0059         <span class="keyword">for</span> j=3:1:length(local_files)
+0060             <span class="keyword">if</span> strfind(local_files(j).name,input_params.IF)
+0061                 IF_channel{count} =[subdir{i-2} local_files(j).name];
+0062                 uniq_folder_id{count} = p(i).name(end-1:end);
+0063             <span class="keyword">elseif</span> strfind(local_files(j).name,input_params.FISH)
+0064                 FISH_channel{count} =[subdir{i-2} local_files(j).name];
+0065 
+0066             <span class="keyword">end</span> 
+0067         <span class="keyword">end</span>
+0068         count= count+1;
+0069     <span class="keyword">end</span>
+0070 <span class="keyword">end</span>
+0071 <span class="comment">%probe csv folder if exists:</span>
+0072 
+0073 <span class="keyword">if</span> ((input_params.curate_called_foci) || (~input_params.automatically_call_foci))
+0074    p = dir(input_params.csv_folder);
+0075    count = 1;
+0076    <span class="keyword">for</span> id=1:1:length(uniq_folder_id)
+0077        i=3;
+0078        flag =0;
+0079        <span class="keyword">while</span> ((i&lt;=length(p)) &amp;&amp; (flag==0))
+0080             indx = strfind(p(i).name,uniq_folder_id{id});
+0081             <span class="keyword">if</span> ~isempty(indx)
+0082                 curated_foci_name{id} = [input_params.csv_folder p(i).name];
+0083                 flag =1;
+0084             <span class="keyword">end</span>
+0085             i=i+1;
+0086        <span class="keyword">end</span>
+0087     <span class="keyword">end</span>
+0088 <span class="keyword">end</span>
+0089 
+0090 
+0091 <span class="comment">%   Thresholds for max and min areas of FISH foci per stack</span>
+0092 FISH_area_threshold = 1;
+0093 FISH_max_area_threshold = 200;
+0094 <span class="comment">%   Data structure that keeps track of all the foci across experiments</span>
+0095 overall_images = [];
+0096 
+0097 <span class="comment">%   Range of z-stack offsets from min_offset to max_offset</span>
+0098 max_offset = 0;
+0099 min_offset = 0;
+0100 offset_range = min_offset:1:max_offset;
+0101 
+0102 [outputdir filen]= fileparts(directory_name);
+0103 [parentFolder filen] =fileparts(outputdir);
+0104 gene_folder = parentFolder;
+0105 [temp pair_of_genes] = fileparts(parentFolder);
+0106 
+0107 
+0108 FISH_name = input_params.FISH_name;
+0109 IF_name = input_params.IF_name;
+0110 
+0111 
+0112 parentFolder = [parentFolder <span class="string">'/'</span> output_dir_name];
+0113 <span class="keyword">if</span> ~exist(parentFolder, <span class="string">'dir'</span>) &amp;&amp; ~isempty(parentFolder)
+0114     mkdir(parentFolder);
+0115 <span class="keyword">end</span>
+0116 overall_images.I = cell(max_offset-min_offset+1,1);
+0117 overall_images.S = cell(max_offset-min_offset+1,1);
+0118 overall_images.F = cell(max_offset-min_offset+1,1);
+0119 
+0120 
+0121 <span class="keyword">if</span> input_params.flag
+0122     FISH_area_threshold = input_params.FISH_threshold;
+0123 <span class="keyword">end</span>
+0124 
+0125 
+0126 foci_ac= 1;
+0127 image_data_set = {};
+0128 
+0129 <span class="keyword">for</span> file =1:1:length(IF_channel)
+0130     n_images=numel(imfinfo(IF_channel{file}));
+0131     count =1;
+0132     Image_store = {};
+0133     Fish_store= [];
+0134     stats_relevant = [];
+0135     filename = IF_channel{file};
+0136     filename_FISH = FISH_channel{file};
+0137     
+0138     <span class="keyword">for</span> stack = 1:1:n_images
+0139         [X,map] = imread(filename,stack);
+0140         X_store{file,stack} =X;
+0141     <span class="keyword">end</span>
+0142     <span class="keyword">for</span> stack=1:1:n_images
+0143         <span class="comment">% Stack of BRD4</span>
+0144         
+0145         [XF,mapF] = imread(filename_FISH,stack);
+0146         XF_store{file,stack} = XF;
+0147         
+0148         <span class="keyword">if</span> ~input_params.flag
+0149             mean_intensity = mean(mean(XF));
+0150             
+0151             bwF= imbinarize(XF,2.1*mean_intensity/65535);
+0152         <span class="keyword">else</span>
+0153             mean_intensity = mean(mean(XF));
+0154             bwF= imbinarize(XF,input_params.threshold_multiplier*mean_intensity/65535);
+0155         <span class="keyword">end</span>
+0156         
+0157         bwF = bwareaopen(bwF,FISH_area_threshold);
+0158         store_data{file,stack} = bwF;
+0159         [BF,LF] = bwboundaries(bwF,<span class="string">'noholes'</span>);
+0160         
+0161         
+0162         stats = regionprops(LF,<span class="string">'BoundingBox'</span>,<span class="string">'Area'</span>,<span class="string">'Centroid'</span>, <span class="string">'MajorAxisLength'</span>,<span class="string">'MinorAxisLength'</span>,<span class="string">'PixelIdxList'</span>);
+0163         <span class="comment">%</span>
+0164         
+0165         B_rel = [];
+0166         stat_rel = [];
+0167         size_box = input_params.size_box;
+0168         <span class="keyword">if</span> ~isempty(stats)
+0169             
+0170             <span class="keyword">for</span> b_rel = 1:length(BF)
+0171                 <span class="keyword">if</span> (stats(b_rel).Area &gt;= FISH_area_threshold) &amp;&amp; (stats(b_rel).Area &lt;FISH_max_area_threshold)
+0172                     Centroid = stats(b_rel).Centroid;
+0173                     
+0174                     <span class="keyword">if</span> (floor(Centroid(1)) - size_box &gt;1) &amp;&amp; (floor(Centroid(1)) + size_box&lt;size(XF,1)) &amp;&amp; (floor(Centroid(2)) + size_box&lt;size(XF,1)) &amp;&amp; (floor(Centroid(2)) - size_box&gt;1)
+0175                         flag_end_stack_points = 0;
+0176                         <span class="keyword">if</span> (stack==1)
+0177                             flag_end_stack_points =1;
+0178                         <span class="keyword">elseif</span> (stack&lt;= n_images-max_offset)
+0179                             <span class="keyword">for</span> local_stack = 1:1:size(offset_range,2)
+0180                                 Image_store{count}(:,:,local_stack) = X_store{file,stack+offset_range(local_stack)}(floor(Centroid(2)) - size_box:floor(Centroid(2)) + size_box,floor(Centroid(1)) - size_box:floor(Centroid(1)) + size_box);
+0181                             <span class="keyword">end</span>
+0182                         <span class="keyword">else</span>
+0183                             flag_end_stack_points =1;
+0184                         <span class="keyword">end</span>
+0185                         
+0186                         <span class="keyword">if</span> ~flag_end_stack_points
+0187                             Fish_store(:,:,count) =  XF_store{file,stack}(floor(Centroid(2)) - size_box:floor(Centroid(2)) + size_box,floor(Centroid(1)) - size_box:floor(Centroid(1)) + size_box);
+0188                             stats_relevant(count,1:2) = Centroid;
+0189                             stats_relevant(count,3) = stack;
+0190                             stats_relevant(count,4) = stats(b_rel).Area;
+0191                             stats_relevant(count,5) = mean(XF_store{file,stack}(stats(b_rel).PixelIdxList));
+0192                             count = count+1;
+0193                         <span class="keyword">end</span>
+0194                     <span class="keyword">end</span>
+0195                 <span class="keyword">end</span>
+0196             <span class="keyword">end</span>
+0197         <span class="keyword">end</span>
+0198     <span class="keyword">end</span>
+0199     
+0200     
+0201     <span class="keyword">if</span> ~isempty(Image_store)
+0202         <span class="keyword">for</span> offset = 1:1:size(offset_range,2)
+0203             
+0204             IF_store = [];
+0205 <span class="comment">%             curated_foci_name{file} = [gene_folder '/Foci_calls/' pair_of_genes '_' p(file+2).name(end-1:end) '.' FISH_name '.csv'];</span>
+0206             
+0207             
+0208             <span class="keyword">for</span> i =1:1:size(Fish_store,3)
+0209                 IF_store(:,:,i) = Image_store{i}(:,:,offset);
+0210             <span class="keyword">end</span>
+0211             
+0212             <span class="keyword">if</span> input_params.automatically_call_foci
+0213                 [COM]= <a href="find_foci_centroid.html" class="code" title="function [COM]= find_foci_centroid(Fish_store,IF_store,stats_relevant,input_params)">find_foci_centroid</a>(Fish_store,IF_store,stats_relevant,input_params);
+0214                 <span class="keyword">if</span> input_params.curate_called_foci
+0215                     [COM] = <a href="curate_foci_COM.html" class="code" title="function [COM] = curate_foci_COM(curated_foci_csv,COM,input_params)">curate_foci_COM</a>(curated_foci_name{file},COM,input_params);
+0216                 <span class="keyword">end</span>
+0217             <span class="keyword">else</span>
+0218                 called_foci = csvread(curated_foci_name{file},1,4);
+0219                 called_foci(:,4:6) = [];
+0220                 COM = [];
+0221                 COM(:,1:2) = ceil(called_foci(:,1:2)/xpixel);
+0222                 COM(:,3) = round(called_foci(:,3)/zpixel);
+0223             <span class="keyword">end</span>
+0224             
+0225             size_box_xy = input_params.size_box;
+0226             size_box_z = floor((size_box_xy*xpixel)/zpixel);
+0227             <span class="keyword">for</span> foci = 1:1:size(COM,1)
+0228                 Centroid = COM(foci,:);
+0229                 stack_centroid = Centroid(3);
+0230                 
+0231                 
+0232                 
+0233                 <span class="keyword">if</span> (stack_centroid - size_box_z &gt;1) &amp;&amp; (stack_centroid +size_box_z &lt; n_images - offset_range(offset))
+0234                     <span class="keyword">if</span> (floor(Centroid(1)) - size_box &gt;1) &amp;&amp; (floor(Centroid(1)) + size_box&lt;size(XF,1)) &amp;&amp; (floor(Centroid(2)) + size_box&lt;size(XF,1)) &amp;&amp; (floor(Centroid(2)) - size_box&gt;1)
+0235                         
+0236                         <span class="keyword">for</span> stack = 1:1:2*size_box_z +1
+0237                             FISH_data{foci_ac}(:,:,stack) = XF_store{file,round(stack_centroid) -size_box_z -1+stack+offset_range(offset)}(floor(Centroid(2)) - size_box:floor(Centroid(2)) + size_box,floor(Centroid(1)) - size_box:floor(Centroid(1)) + size_box);
+0238                             IF_data{foci_ac}(:,:,stack) = X_store{file,round(stack_centroid) -size_box_z -1+stack+offset_range(offset)}(floor(Centroid(2)) - size_box:floor(Centroid(2)) + size_box,floor(Centroid(1)) - size_box:floor(Centroid(1)) + size_box);
+0239                         <span class="keyword">end</span>
+0240                         [FISH_IRF{foci_ac}] = <a href="convert_3D_image_IRF.html" class="code" title="function [IRF] = convert_3D_image_IRF(Data,input_params)">convert_3D_image_IRF</a>(FISH_data{foci_ac},input_params);                        
+0241                         [IF_IRF{foci_ac}] = <a href="convert_3D_image_IRF.html" class="code" title="function [IRF] = convert_3D_image_IRF(Data,input_params)">convert_3D_image_IRF</a>(IF_data{foci_ac},input_params);
+0242                         image_data_set{foci_ac} = filename;
+0243                         COM_data(foci_ac,:) = COM(foci,:);
+0244                         foci_ac =foci_ac +1;
+0245 
+0246                     <span class="keyword">end</span>
+0247                 <span class="keyword">end</span>
+0248                 
+0249             <span class="keyword">end</span>
+0250 
+0251         <span class="keyword">end</span>
+0252     <span class="keyword">end</span>
+0253 <span class="keyword">end</span>
+0254 
+0255 
+0256 <span class="keyword">for</span> offset=1:1:size(offset_range,2)
+0257     raw_data = [parentFolder <span class="string">'/Combined_data/'</span> <span class="string">'All_data_'</span> num2str(offset_range(offset)) <span class="string">'.mat'</span>];
+0258     combined_IRF_figure = [parentFolder <span class="string">'/Combined_data/'</span> <span class="string">'All_IRF_'</span> num2str(offset_range(offset))];
+0259     combined_average_figure = [parentFolder <span class="string">'/Combined_data/'</span> <span class="string">'All_average_'</span> num2str(offset_range(offset))];
+0260 
+0261     [temp_parent,temp] =fileparts(raw_data);
+0262     <span class="keyword">if</span> ~exist(temp_parent, <span class="string">'dir'</span>) &amp;&amp; ~isempty(temp_parent)
+0263         mkdir(temp_parent);
+0264     <span class="keyword">end</span>
+0265     <span class="keyword">if</span> ~isempty(FISH_data)
+0266         save([temp_parent <span class="string">'/Total_data.mat'</span>],<span class="string">'FISH_IRF'</span>,<span class="string">'IF_IRF'</span>,<span class="string">'FISH_data'</span>,<span class="string">'IF_data'</span>,<span class="string">'COM_data'</span>,<span class="string">'image_data_set'</span>,<span class="string">'input_params'</span>);
+0267         <a href="generate_IRF_collapse_plot.html" class="code" title="function generate_IRF_collapse_plot(FISH_IRF,IF_IRF,ind_flag,figure_name)">generate_IRF_collapse_plot</a>(FISH_IRF,IF_IRF,input_params.ind_flag,combined_IRF_figure);
+0268         <a href="generate_average_images.html" class="code" title="function [Rand_protein,Rand_IF] = generate_average_images(Image_store,Fish_store,figure_name,IF_name,FISH_name)">generate_average_images</a>(IF_data,FISH_data,combined_average_figure,IF_name,FISH_name);
+0269     <span class="keyword">end</span>
+0270 <span class="keyword">end</span>
+0271 <span class="keyword">end</span>
+0272 <span class="comment">%</span>
+0273</pre></div>
+<hr><address>Generated on Mon 11-Mar-2019 16:08:27 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

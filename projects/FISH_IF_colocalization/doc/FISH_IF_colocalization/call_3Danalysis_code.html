@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of call_3Danalysis_code</title>
+  <meta name="keywords" content="call_3Danalysis_code">
+  <meta name="description" content="Runs 3D FISH-IF colocalization upon user-defined input">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">FISH_IF_colocalization</a> &gt; call_3Danalysis_code.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for FISH_IF_colocalization&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>call_3Danalysis_code
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Runs 3D FISH-IF colocalization upon user-defined input</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">   Runs 3D FISH-IF colocalization upon user-defined input
+   User needs to provide the following input:
+       o directory_name == path to images (see guide for file organization)
+       o output_dir_name == path to write output (nested within above folder)
+       o FISH_name == Name of the FISH channel (appears on plots/data)
+       o IF_name == Name of the IF channel (appears on plots/data)
+       o FISH_channel == Used to assign image file to channel 
+       o IF_channel == Used to assign image file to channel 
+
+   Examples:
+    &gt;&gt; call_3Danalysis_code.m --&gt; calls params.m</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="params.html" class="code" title="function params(directory_name,output_dir_name,in_params)">params</a>	Parametrizes input with typical image-analysis parameters</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%   Runs 3D FISH-IF colocalization upon user-defined input</span>
+0002 <span class="comment">%   User needs to provide the following input:</span>
+0003 <span class="comment">%       o directory_name == path to images (see guide for file organization)</span>
+0004 <span class="comment">%       o output_dir_name == path to write output (nested within above folder)</span>
+0005 <span class="comment">%       o FISH_name == Name of the FISH channel (appears on plots/data)</span>
+0006 <span class="comment">%       o IF_name == Name of the IF channel (appears on plots/data)</span>
+0007 <span class="comment">%       o FISH_channel == Used to assign image file to channel</span>
+0008 <span class="comment">%       o IF_channel == Used to assign image file to channel</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%   Examples:</span>
+0011 <span class="comment">%    &gt;&gt; call_3Danalysis_code.m --&gt; calls params.m</span>
+0012 
+0013 
+0014 tic;
+0015 addpath(<span class="string">'source_files/'</span>);
+0016 directory_name = <span class="string">'nanog_brd4/Images/'</span>;
+0017 output_dir_name = <span class="string">'brd4_nanog_output'</span>;
+0018 in_params.FISH_name = <span class="string">'Nanog'</span>;
+0019 in_params.IF_name = <span class="string">'brd4'</span>;
+0020 in_params.FISH_channel = <span class="string">'561'</span>;
+0021 in_params.IF_channel = <span class="string">'488'</span>;
+0022 <a href="params.html" class="code" title="function params(directory_name,output_dir_name,in_params)">params</a>(directory_name,output_dir_name,in_params);
+0023 time_to_complete = toc;
+0024 disp([<span class="string">'Simulation converged in '</span> num2str(time_to_complete) <span class="string">' seconds'</span>]);</pre></div>
+<hr><address>Generated on Mon 11-Mar-2019 16:08:27 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

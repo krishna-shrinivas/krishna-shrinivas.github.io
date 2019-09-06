@@ -1,0 +1,393 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of production_average_images</title>
+  <meta name="keywords" content="production_average_images">
+  <meta name="description" content="Produce &quot;production&quot; quality FISH-IF plots from input data">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="../index.html">FISH_IF_colocalization</a> &gt; <a href="index.html">source_files</a> &gt; production_average_images.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for FISH_IF_colocalization/source_files&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>production_average_images
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Produce &quot;production&quot; quality FISH-IF plots from input data</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function production_average_images(Image_store,Fish_store,Random_store,figure_name,IF_name,FISH_name,FISH_color,IF_color,stack_range) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">   Produce &quot;production&quot; quality FISH-IF plots from input data
+   This function was broadly tweaked to generate the plots that were
+   eventually used for publication. The inputs are the image matrices for
+   the FISH and IF, as well as random IF data. Various labels are input
+   parameters, and the color choice.
+   Figures are saved under figure_name</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../FISH_IF_colocalization/params.html" class="code" title="function params(directory_name,output_dir_name,in_params)">params</a>	Parametrizes input with typical image-analysis parameters</li><li><a href="../../FISH_IF_colocalization/source_files/utils/production_quality_images.html" class="code" title="">production_quality_images</a>	</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [ rgb ] = hex2rgb(hex,range)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function production_average_images(Image_store,Fish_store,Random_store,figure_name,IF_name,FISH_name,FISH_color,IF_color,stack_range)</a>
+0002 <span class="comment">%   Produce &quot;production&quot; quality FISH-IF plots from input data</span>
+0003 <span class="comment">%   This function was broadly tweaked to generate the plots that were</span>
+0004 <span class="comment">%   eventually used for publication. The inputs are the image matrices for</span>
+0005 <span class="comment">%   the FISH and IF, as well as random IF data. Various labels are input</span>
+0006 <span class="comment">%   parameters, and the color choice.</span>
+0007 <span class="comment">%   Figures are saved under figure_name</span>
+0008 pixeltoumxy = 0.0572;
+0009 
+0010 <span class="keyword">if</span> isempty(Random_store)
+0011     close all;
+0012     IF_proc = [];
+0013     FISH_proc = [];
+0014     <span class="keyword">for</span> i=1:1:length(Fish_store)
+0015         IF_proc(:,:,i) = mean(Image_store{i}(:,:,stack_range(1):stack_range(2)),3);
+0016         FISH_proc(:,:,i) = mean(Fish_store{i}(:,:,stack_range(1):stack_range(2)),3);
+0017     <span class="keyword">end</span>
+0018     average_FISH = mean(FISH_proc,3);
+0019     average_protein = mean(IF_proc,3);
+0020 
+0021     n_colors = 16;
+0022     FISH_color_map = zeros(n_colors,3);
+0023     protein_color_map = zeros(n_colors,3);
+0024 
+0025     <span class="keyword">for</span> i=1:1:3
+0026         FISH_color_map(:,i) = linspace(0,FISH_color(i),n_colors);
+0027         protein_color_map(:,i) = linspace(0,IF_color(i),n_colors);
+0028 
+0029     <span class="keyword">end</span>
+0030 
+0031     <span class="comment">% Color scheme 1</span>
+0032     hex_list = {<span class="string">'#000000'</span>,<span class="string">'#18091f'</span>,<span class="string">'#250d38'</span>,<span class="string">'#330c52'</span>,<span class="string">'#41066f'</span>,<span class="string">'#480381'</span>,<span class="string">'#3f0c7d'</span>,<span class="string">'#351179'</span>,<span class="string">'#2a1575'</span>,<span class="string">'#1e1871'</span>,<span class="string">'#37386d'</span>,<span class="string">'#4c6765'</span>,<span class="string">'#529859'</span>,<span class="string">'#48ca44'</span>,<span class="string">'#00ff00'</span>};
+0033     cmap_trial =<a href="#_sub1" class="code" title="subfunction [ rgb ] = hex2rgb(hex,range)">hex2rgb</a>(hex_list);
+0034 
+0035     figure;
+0036     set(gcf, <span class="string">'Visible'</span>, <span class="string">'on'</span>);
+0037     X = [0:1:size(average_protein,2)-1]*pixeltoumxy -0.5*size(average_protein,2)*pixeltoumxy;
+0038     Y = [0:1:size(average_protein,2)-1]*pixeltoumxy -0.5*size(average_protein,2)*pixeltoumxy;
+0039 
+0040     ax1= subplot(2,2,1);
+0041 
+0042     [Cf,hf]=contourf(X,Y,average_FISH);
+0043     colormap(ax1,FISH_color_map); hold on;
+0044     xlabel(<span class="string">'\mum'</span>);
+0045     ylabel(<span class="string">'\mum'</span>);
+0046     pbaspect([2 2 1]);
+0047     hf.LineStyle=<span class="string">'none'</span>;
+0048     <span class="comment">% hf.LevelStep =30;</span>
+0049     title([FISH_name <span class="string">' FISH'</span>],<span class="string">'FontSize'</span>,16);
+0050 
+0051     minz = min(min(average_FISH));
+0052     maxz = max(max(average_FISH));
+0053     ax2 = subplot(2,2,2);
+0054     surf(X,Y,average_FISH); hold on;
+0055     xlabel(<span class="string">'\mum'</span>);
+0056     ylabel(<span class="string">'\mum'</span>);
+0057 
+0058     view(ax2,[298.1 26]);
+0059     zlim([minz maxz]);
+0060     xlim([min(X) max(X)]);
+0061     ylim([min(Y) max(Y)]);
+0062 
+0063     colormap(ax2,FISH_color_map);
+0064     title([FISH_name <span class="string">' FISH intensity'</span>],<span class="string">'FontSize'</span>,16);
+0065     colorbar
+0066 
+0067     <span class="comment">% colormap default</span>
+0068     ax3=subplot(2,2,3);
+0069     [C,h]=contourf(X,Y,average_protein); hold on;
+0070     xlabel(<span class="string">'\mum'</span>);
+0071     ylabel(<span class="string">'\mum'</span>);
+0072 
+0073 
+0074     h.LineStyle =<span class="string">'none'</span>;
+0075     <span class="comment">% h.LevelStep =15;</span>
+0076     colormap(ax3,cmap_trial); 
+0077     title([IF_name <span class="string">' IF'</span>],<span class="string">'FontSize'</span>,16);
+0078     pbaspect([1 1 1]);
+0079 
+0080     minz = min(min(average_protein));
+0081     maxz = max(max(average_protein));
+0082     ax4=subplot(2,2,4);
+0083     surf(X,Y,average_protein); hold on;
+0084     view(ax4,[298.1 26]);
+0085     xlabel(<span class="string">'\mum'</span>);
+0086     ylabel(<span class="string">'\mum'</span>);
+0087 
+0088     zlim([minz maxz]);
+0089     xlim([min(X) max(X)]);
+0090     ylim([min(Y) max(Y)]);
+0091     title([IF_name <span class="string">' IF Intensity'</span>],<span class="string">'FontSize'</span>,16);
+0092     colormap(ax4,cmap_trial); 
+0093     colorbar
+0094 <span class="keyword">else</span>
+0095     close all;
+0096     IF_proc = [];
+0097     FISH_proc = [];
+0098     random_proc = []
+0099     <span class="keyword">for</span> i=1:1:length(Fish_store)
+0100         IF_proc(:,:,i) = mean(Image_store{i}(:,:,stack_range(1):stack_range(2)),3);
+0101         FISH_proc(:,:,i) = mean(Fish_store{i}(:,:,stack_range(1):stack_range(2)),3);
+0102     <span class="keyword">end</span>
+0103     <span class="keyword">for</span> i=1:1:length(Random_store)
+0104         random_proc(:,:,i) = mean(Random_store{i}(:,:,stack_range(1):stack_range(2)),3);
+0105     
+0106     <span class="keyword">end</span>
+0107     average_FISH = mean(FISH_proc,3);
+0108     average_protein = mean(IF_proc,3);
+0109     average_random_protein = mean(random_proc,3);
+0110     
+0111     n_colors = 16;
+0112     FISH_color_map = zeros(n_colors,3);
+0113     protein_color_map = zeros(n_colors,3);
+0114 
+0115     <span class="keyword">for</span> i=1:1:3
+0116         FISH_color_map(:,i) = linspace(0,FISH_color(i),n_colors);
+0117         protein_color_map(:,i) = linspace(0,IF_color(i),n_colors);
+0118 
+0119     <span class="keyword">end</span>
+0120 
+0121 
+0122     hex_list = {<span class="string">'#000000'</span>,<span class="string">'#18091f'</span>,<span class="string">'#250d38'</span>,<span class="string">'#330c52'</span>,<span class="string">'#41066f'</span>,<span class="string">'#480381'</span>,<span class="string">'#3f0c7d'</span>,<span class="string">'#351179'</span>,<span class="string">'#2a1575'</span>,<span class="string">'#1e1871'</span>,<span class="string">'#37386d'</span>,<span class="string">'#4c6765'</span>,<span class="string">'#529859'</span>,<span class="string">'#48ca44'</span>,<span class="string">'#00ff00'</span>};
+0123     cmap_trial =<a href="#_sub1" class="code" title="subfunction [ rgb ] = hex2rgb(hex,range)">hex2rgb</a>(hex_list);
+0124 
+0125     figure;
+0126     set(gcf, <span class="string">'Visible'</span>, <span class="string">'on'</span>);
+0127     X = [0:1:size(average_protein,2)-1]*pixeltoumxy -0.5*size(average_protein,2)*pixeltoumxy;
+0128     Y = [0:1:size(average_protein,2)-1]*pixeltoumxy -0.5*size(average_protein,2)*pixeltoumxy;
+0129 
+0130     ax1= subplot(3,2,1);
+0131 
+0132     [Cf,hf]=contourf(X,Y,average_FISH);
+0133     colormap(ax1,FISH_color_map); hold on;
+0134     xlabel(<span class="string">'\mum'</span>);
+0135     ylabel(<span class="string">'\mum'</span>);
+0136     pbaspect([2 2 1]);
+0137     hf.LineStyle=<span class="string">'none'</span>;
+0138     colorbar;
+0139     <span class="comment">% hf.LevelStep =30;</span>
+0140     title([FISH_name <span class="string">' FISH'</span>],<span class="string">'FontSize'</span>,16);
+0141 
+0142     minz = min(min(average_FISH));
+0143     maxz = max(max(average_FISH));
+0144 
+0145     ax2 = subplot(3,2,2);
+0146     surf(X,Y,average_FISH); hold on;
+0147     xlabel(<span class="string">'\mum'</span>);
+0148     ylabel(<span class="string">'\mum'</span>);
+0149 
+0150     view(ax2,[298.1 26]);
+0151     zlim([minz maxz]);
+0152     xlim([min(X) max(X)]);
+0153     ylim([min(Y) max(Y)]);
+0154 
+0155     colormap(ax2,FISH_color_map);
+0156     title([FISH_name <span class="string">' FISH intensity'</span>],<span class="string">'FontSize'</span>,16);
+0157     colorbar
+0158 
+0159     
+0160     minz = min(min(min(average_protein)),min(min(average_random_protein)));
+0161     maxz = max(max(max(average_protein)),max(max(average_random_protein)));
+0162 
+0163     
+0164     <span class="comment">% colormap default</span>
+0165     ax3=subplot(3,2,3);
+0166     [C,h]=contourf(X,Y,average_protein); hold on;
+0167     xlabel(<span class="string">'\mum'</span>);
+0168     ylabel(<span class="string">'\mum'</span>);
+0169 
+0170     h.LineStyle =<span class="string">'none'</span>;
+0171     <span class="comment">% h.LevelStep =15;</span>
+0172     ax3.CLim = [minz maxz];
+0173     colormap(ax3,cmap_trial); 
+0174     title([IF_name <span class="string">' IF'</span>],<span class="string">'FontSize'</span>,16);
+0175     colorbar;
+0176 
+0177     pbaspect([1 1 1]);
+0178    
+0179     ax4=subplot(3,2,4);
+0180     surf(X,Y,average_protein); hold on;
+0181     view(ax4,[298.1 26]);
+0182     xlabel(<span class="string">'\mum'</span>);
+0183     ylabel(<span class="string">'\mum'</span>);
+0184         ax4.CLim = [minz maxz];
+0185 
+0186     zlim([minz maxz]);
+0187     xlim([min(X) max(X)]);
+0188     ylim([min(Y) max(Y)]);
+0189     title([IF_name <span class="string">' IF Intensity'</span>],<span class="string">'FontSize'</span>,16);
+0190     colormap(ax4,cmap_trial); 
+0191     colorbar
+0192     
+0193     ax5=subplot(3,2,5);
+0194     [C,h]=contourf(X,Y,average_random_protein); hold on;
+0195     xlabel(<span class="string">'\mum'</span>);
+0196     ylabel(<span class="string">'\mum'</span>);
+0197     ax5.CLim = [minz maxz];
+0198 
+0199     h.LineStyle =<span class="string">'none'</span>;
+0200     <span class="comment">% h.LevelStep =15;</span>
+0201     
+0202     colormap(ax5,cmap_trial); 
+0203     title([IF_name <span class="string">' Random IF'</span>],<span class="string">'FontSize'</span>,16);
+0204     pbaspect([1 1 1]);
+0205     colorbar;
+0206 
+0207 
+0208     ax6=subplot(3,2,6);
+0209     surf(X,Y,average_random_protein); hold on;
+0210     view(ax6,[298.1 26]);
+0211     xlabel(<span class="string">'\mum'</span>);
+0212     ylabel(<span class="string">'\mum'</span>);
+0213 
+0214     zlim([minz maxz]);
+0215     xlim([min(X) max(X)]);
+0216     ylim([min(Y) max(Y)]);
+0217         ax6.CLim = [minz maxz];
+0218 
+0219     title([IF_name <span class="string">' Random IF Intensity'</span>],<span class="string">'FontSize'</span>,16);
+0220     colormap(ax6,cmap_trial); 
+0221     colorbar
+0222 
+0223     
+0224     
+0225     
+0226 <span class="keyword">end</span>
+0227 
+0228 set(gcf, <span class="string">'Position'</span>, get(0, <span class="string">'Screensize'</span>));
+0229 
+0230 saveas(gcf,[figure_name <span class="string">'.fig'</span>]);
+0231 saveas(gcf,[figure_name <span class="string">'.svg'</span>]);
+0232 <span class="keyword">end</span>
+0233 
+0234 <a name="_sub1" href="#_subfunctions" class="code">function [ rgb ] = hex2rgb(hex,range)</a>
+0235 <span class="comment">% hex2rgb converts hex color values to rgb arrays on the range 0 to 1.</span>
+0236 <span class="comment">%</span>
+0237 <span class="comment">%</span>
+0238 <span class="comment">% * * * * * * * * * * * * * * * * * * * *</span>
+0239 <span class="comment">% SYNTAX:</span>
+0240 <span class="comment">% rgb = hex2rgb(hex) returns rgb color values in an n x 3 array. Values are</span>
+0241 <span class="comment">%                    scaled from 0 to 1 by default.</span>
+0242 <span class="comment">%</span>
+0243 <span class="comment">% rgb = hex2rgb(hex,256) returns RGB values scaled from 0 to 255.</span>
+0244 <span class="comment">%</span>
+0245 <span class="comment">%</span>
+0246 <span class="comment">% * * * * * * * * * * * * * * * * * * * *</span>
+0247 <span class="comment">% EXAMPLES:</span>
+0248 <span class="comment">%</span>
+0249 <span class="comment">% myrgbvalue = hex2rgb('#334D66')</span>
+0250 <span class="comment">%    = 0.2000    0.3020    0.4000</span>
+0251 <span class="comment">%</span>
+0252 <span class="comment">%</span>
+0253 <span class="comment">% myrgbvalue = hex2rgb('334D66')  % &lt;-the # sign is optional</span>
+0254 <span class="comment">%    = 0.2000    0.3020    0.4000</span>
+0255 <span class="comment">%</span>
+0256 <span class="comment">%</span>
+0257 <span class="comment">% myRGBvalue = hex2rgb('#334D66',256)</span>
+0258 <span class="comment">%    = 51    77   102</span>
+0259 <span class="comment">%</span>
+0260 <span class="comment">%</span>
+0261 <span class="comment">% myhexvalues = ['#334D66';'#8099B3';'#CC9933';'#3333E6'];</span>
+0262 <span class="comment">% myrgbvalues = hex2rgb(myhexvalues)</span>
+0263 <span class="comment">%    =   0.2000    0.3020    0.4000</span>
+0264 <span class="comment">%        0.5020    0.6000    0.7020</span>
+0265 <span class="comment">%        0.8000    0.6000    0.2000</span>
+0266 <span class="comment">%        0.2000    0.2000    0.9020</span>
+0267 <span class="comment">%</span>
+0268 <span class="comment">%</span>
+0269 <span class="comment">% myhexvalues = ['#334D66';'#8099B3';'#CC9933';'#3333E6'];</span>
+0270 <span class="comment">% myRGBvalues = hex2rgb(myhexvalues,256)</span>
+0271 <span class="comment">%    =   51    77   102</span>
+0272 <span class="comment">%       128   153   179</span>
+0273 <span class="comment">%       204   153    51</span>
+0274 <span class="comment">%        51    51   230</span>
+0275 <span class="comment">%</span>
+0276 <span class="comment">% HexValsAsACharacterArray = {'#334D66';'#8099B3';'#CC9933';'#3333E6'};</span>
+0277 <span class="comment">% rgbvals = hex2rgb(HexValsAsACharacterArray)</span>
+0278 <span class="comment">%</span>
+0279 <span class="comment">% * * * * * * * * * * * * * * * * * * * *</span>
+0280 <span class="comment">% Chad A. Greene, April 2014</span>
+0281 <span class="comment">%</span>
+0282 <span class="comment">% Updated August 2014: Functionality remains exactly the same, but it's a</span>
+0283 <span class="comment">% little more efficient and more robust. Thanks to Stephen Cobeldick for</span>
+0284 <span class="comment">% the improvement tips. In this update, the documentation now shows that</span>
+0285 <span class="comment">% the range may be set to 256. This is more intuitive than the previous</span>
+0286 <span class="comment">% style, which scaled values from 0 to 255 with range set to 255.  Now you</span>
+0287 <span class="comment">% can enter 256 or 255 for the range, and the answer will be the same--rgb</span>
+0288 <span class="comment">% values scaled from 0 to 255. Function now also accepts character arrays</span>
+0289 <span class="comment">% as input.</span>
+0290 <span class="comment">%</span>
+0291 <span class="comment">% * * * * * * * * * * * * * * * * * * * *</span>
+0292 <span class="comment">% See also rgb2hex, dec2hex, hex2num, and ColorSpec.</span>
+0293 <span class="comment">%</span>
+0294 
+0295 <span class="comment">%% Input checks:</span>
+0296 
+0297 assert(nargin&gt;0&amp;nargin&lt;3,<span class="string">'hex2rgb function must have one or two inputs.'</span>) 
+0298 
+0299 <span class="keyword">if</span> nargin==2
+0300     assert(isscalar(range)==1,<span class="string">'Range must be a scalar, either &quot;1&quot; to scale from 0 to 1 or &quot;256&quot; to scale from 0 to 255.'</span>)
+0301 <span class="keyword">end</span>
+0302 
+0303 <span class="comment">%% Tweak inputs if necessary:</span>
+0304 
+0305 <span class="keyword">if</span> iscell(hex)
+0306     assert(isvector(hex)==1,<span class="string">'Unexpected dimensions of input hex values.'</span>)
+0307     
+0308     <span class="comment">% In case cell array elements are separated by a comma instead of a</span>
+0309     <span class="comment">% semicolon, reshape hex:</span>
+0310     <span class="keyword">if</span> isrow(hex)
+0311         hex = hex'; 
+0312     <span class="keyword">end</span>
+0313     
+0314     <span class="comment">% If input is cell, convert to matrix:</span>
+0315     hex = cell2mat(hex);
+0316 <span class="keyword">end</span>
+0317 
+0318 <span class="keyword">if</span> strcmpi(hex(1,1),<span class="string">'#'</span>)
+0319     hex(:,1) = [];
+0320 <span class="keyword">end</span>
+0321 
+0322 <span class="keyword">if</span> nargin == 1
+0323     range = 1; 
+0324 <span class="keyword">end</span>
+0325 
+0326 <span class="comment">%% Convert from hex to rgb:</span>
+0327 
+0328 <span class="keyword">switch</span> range
+0329     <span class="keyword">case</span> 1
+0330         rgb = reshape(sscanf(hex.',<span class="string">'%2x'</span>),3,[]).'/255;
+0331 
+0332     <span class="keyword">case</span> {255,256}
+0333         rgb = reshape(sscanf(hex.',<span class="string">'%2x'</span>),3,[]).';
+0334     
+0335     <span class="keyword">otherwise</span>
+0336         error(<span class="string">'Range must be either &quot;1&quot; to scale from 0 to 1 or &quot;256&quot; to scale from 0 to 255.'</span>)
+0337 <span class="keyword">end</span>
+0338 
+0339 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 11-Mar-2019 16:08:27 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

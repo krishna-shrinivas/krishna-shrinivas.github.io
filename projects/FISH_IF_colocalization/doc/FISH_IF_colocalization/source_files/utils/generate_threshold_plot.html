@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of generate_threshold_plot</title>
+  <meta name="keywords" content="generate_threshold_plot">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">FISH_IF_colocalization</a> &gt; <a href="../index.html">source_files</a> &gt; <a href="index.html">utils</a> &gt; generate_threshold_plot.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for FISH_IF_colocalization/source_files/utils&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>generate_threshold_plot
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function generate_threshold_plot(FISH_data,IF_data,threshold_IF,normalize_flag,pos) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function generate_threshold_plot(FISH_data,IF_data,threshold_IF,normalize_flag,pos)</a>
+0002 pos_x= pos(1);
+0003 pos_y = pos(2);
+0004 thresh_min = threshold_IF(1);
+0005 thresh_max = threshold_IF(2);
+0006 z_stacks = size(FISH_data{1},3);
+0007 count =0;  mean_IF = [];
+0008 xy_drift= 3;
+0009 subplot(2,2,1);
+0010 avg_intensity = zeros(size(FISH_data,2),z_stacks);
+0011 <span class="keyword">for</span> i =1:1:size(FISH_data,2)
+0012     
+0013     <span class="keyword">for</span> zpos =1:1:z_stacks
+0014         <span class="keyword">for</span> l=xy_drift*-1:1:xy_drift
+0015             <span class="keyword">for</span> m=xy_drift*-1:1:xy_drift
+0016                 avg_intensity(i,zpos) = avg_intensity(i,zpos)+double(IF_data{i}(pos_x+l,pos_y+m,zpos));
+0017             <span class="keyword">end</span>
+0018         <span class="keyword">end</span>
+0019     <span class="keyword">end</span>
+0020     avg_intensity(i,:) = avg_intensity(i,:)/(2*xy_drift+1)^2;
+0021     p = min(double(IF_data{i}(pos_x,pos_y,1:z_stacks)));
+0022     <span class="keyword">if</span>( (max(double(reshape(IF_data{i}(pos_x,pos_y,:),z_stacks,1))/p(1)) &gt; thresh_min) &amp;&amp; (max(double(reshape(IF_data{i}(pos_x,pos_y,:),z_stacks,1))/p(1)) &lt; thresh_max))
+0023         <span class="keyword">if</span> normalize_flag
+0024             plot(double(reshape(IF_data{i}(pos_x,pos_y,:),z_stacks,1))/p(1)); hold on; count= count+1;
+0025             mean_IF(count,:) = double(reshape(IF_data{i}(pos_x,pos_y,:),z_stacks,1))/p(1);
+0026         <span class="keyword">else</span>
+0027             plot(avg_intensity(i,:)); hold on; count= count+1;
+0028             mean_IF(count,:) = double(avg_intensity(i,:));
+0029         <span class="keyword">end</span>
+0030             
+0031     <span class="keyword">end</span>
+0032 <span class="keyword">end</span>
+0033 
+0034 title(<span class="string">'Foci-resolved IF signal'</span>);
+0035 xlabel(<span class="string">'Z coordinate'</span>);
+0036 ylabel(<span class="string">'IF intensity'</span>);
+0037 subplot(2,2,2);
+0038 plot(mean(mean_IF)); hold on;
+0039 title(<span class="string">'&lt;IF&gt; signal'</span>);
+0040 xlabel(<span class="string">'Z coordinate'</span>);
+0041 ylabel(<span class="string">'IF intensity'</span>);
+0042 disp([<span class="string">'No of foci with fold-change int &gt; threshold is '</span> num2str(count-1)]);
+0043 avg_intensity = zeros(size(FISH_data,2),z_stacks);
+0044 
+0045 subplot(2,2,3);
+0046 count =0;
+0047 mean_FISH = [];
+0048 
+0049 <span class="keyword">for</span> i =1:1:size(FISH_data,2)
+0050     
+0051     <span class="keyword">for</span> zpos =1:1:z_stacks
+0052         <span class="keyword">for</span> l=xy_drift*-1:1:xy_drift
+0053             <span class="keyword">for</span> m=xy_drift*-1:1:xy_drift
+0054                 avg_intensity(i,zpos) = avg_intensity(i,zpos)+double(FISH_data{i}(pos_x+l,pos_y+m,zpos));
+0055             <span class="keyword">end</span>
+0056         <span class="keyword">end</span>
+0057     <span class="keyword">end</span>
+0058     avg_intensity(i,:) = avg_intensity(i,:)/(2*xy_drift+1)^2;
+0059     
+0060     p = min(double(FISH_data{i}(pos_x,pos_y,1:z_stacks)));
+0061     p_IF = min(double(IF_data{i}(pos_x,pos_y,1:z_stacks)));
+0062 
+0063     <span class="keyword">if</span>( (max(double(reshape(IF_data{i}(pos_x,pos_y,:),z_stacks,1))/p_IF(1)) &gt; thresh_min) &amp;&amp; (max(double(reshape(IF_data{i}(pos_x,pos_y,:),z_stacks,1))/p_IF(1)) &lt; thresh_max))
+0064         <span class="keyword">if</span> normalize_flag
+0065             semilogy(double(reshape(FISH_data{i}(pos_x,pos_y,:),z_stacks,1))/p(1)); hold on; count= count+1;
+0066             mean_FISH(count,:) = double(reshape(FISH_data{i}(pos_x,pos_y,:),z_stacks,1))/p(1);
+0067         <span class="keyword">else</span>
+0068             plot(avg_intensity(i,:)); hold on; count= count+1;
+0069             mean_FISH(count,:) = double(avg_intensity(i,:));
+0070         <span class="keyword">end</span>
+0071     <span class="keyword">end</span>
+0072 <span class="keyword">end</span>
+0073 title(<span class="string">'Foci-resolved FISH signal'</span>);
+0074 xlabel(<span class="string">'Z coordinate'</span>);
+0075 ylabel(<span class="string">'FISH intensity'</span>);
+0076 
+0077 subplot(2,2,4);
+0078 plot(mean(mean_FISH)); hold on;
+0079 title(<span class="string">'&lt;FISH&gt; signal'</span>);
+0080 xlabel(<span class="string">'Z coordinate'</span>);
+0081 ylabel(<span class="string">'Average intensity'</span>);
+0082 set(gcf, <span class="string">'Position'</span>, get(0, <span class="string">'Screensize'</span>));
+0083 
+0084 
+0085 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 11-Mar-2019 16:08:27 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

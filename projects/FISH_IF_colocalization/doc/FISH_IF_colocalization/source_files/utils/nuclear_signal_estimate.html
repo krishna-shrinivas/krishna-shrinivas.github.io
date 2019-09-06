@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of nuclear_signal_estimate</title>
+  <meta name="keywords" content="nuclear_signal_estimate">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">FISH_IF_colocalization</a> &gt; <a href="../index.html">source_files</a> &gt; <a href="index.html">utils</a> &gt; nuclear_signal_estimate.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for FISH_IF_colocalization/source_files/utils&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>nuclear_signal_estimate
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function[IF_mean] = nuclear_signal_estimate(filename,IF_file) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="normalized_data_collection.html" class="code" title="function [] = normalized_data_collection(directory_name,output_file,input_params)">normalized_data_collection</a>	</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 
+0002 <a name="_sub0" href="#_subfunctions" class="code">function[IF_mean] = nuclear_signal_estimate(filename,IF_file)</a>
+0003 close all;
+0004 
+0005 
+0006 draw = 0;
+0007 file = 1;
+0008 n_images=numel(imfinfo(filename));
+0009 p = {};
+0010 <span class="keyword">for</span> stack = 1:1:n_images
+0011     [X,map] = imread(filename,stack);
+0012     XDNA_store{file,stack} =X;
+0013     p{stack}=double(reshape(X,length(X)^2,1));
+0014     mean_data(stack) = mean(p{stack});
+0015 <span class="keyword">end</span>
+0016 cell_id_thre = 0.1;
+0017 stack_to_check = find(mean_data&gt; 0.1*(max(mean_data)-min(mean_data))+ min(mean_data));
+0018 threshold =0.25;
+0019 list_of_points = [];
+0020 IF_signal = [];
+0021 rand_store = [];
+0022 count = 1;
+0023 <span class="keyword">for</span> stack=1:1:length(stack_to_check)
+0024     bw = im2bw(XDNA_store{file,stack_to_check(stack)},(mean(p{stack_to_check(stack)}) + threshold*std(p{stack_to_check(stack)}))/65535);
+0025     bw = bwareaopen(bw,100);
+0026     [B,L] = bwboundaries(bw,<span class="string">'noholes'</span>);
+0027     stats = regionprops(L,<span class="string">'Area'</span>,<span class="string">'Centroid'</span>, <span class="string">'MajorAxisLength'</span>,<span class="string">'MinorAxisLength'</span>,<span class="string">'PixelIdxList'</span>);
+0028     k_rel = [];
+0029 
+0030     [X_IF,map] = imread(IF_file,stack_to_check(stack));
+0031     
+0032     <span class="keyword">for</span> k = 1:length(B)
+0033         boundary = B{k};
+0034         <span class="keyword">if</span> length(boundary) &gt; 200
+0035            IF_signal = [IF_signal; X_IF(stats(k).PixelIdxList)];    
+0036         <span class="keyword">end</span>
+0037     <span class="keyword">end</span>
+0038 
+0039 
+0040 
+0041 <span class="keyword">end</span>
+0042 
+0043 IF_mean = mean(IF_signal);
+0044 
+0045 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 11-Mar-2019 16:08:27 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

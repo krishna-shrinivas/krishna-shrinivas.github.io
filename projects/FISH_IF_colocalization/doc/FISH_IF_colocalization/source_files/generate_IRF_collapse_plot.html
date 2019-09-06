@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of generate_IRF_collapse_plot</title>
+  <meta name="keywords" content="generate_IRF_collapse_plot">
+  <meta name="description" content="Generates IRF plots">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="../index.html">FISH_IF_colocalization</a> &gt; <a href="index.html">source_files</a> &gt; generate_IRF_collapse_plot.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for FISH_IF_colocalization/source_files&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>generate_IRF_collapse_plot
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Generates IRF plots</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function generate_IRF_collapse_plot(FISH_IRF,IF_IRF,ind_flag,figure_name) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Generates IRF plots
+   Function takes in FISH, IF IRF data inputs, as well as flag to plot
+   individual IRF lines. The figure is saved with figure_name</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="generate_random_foci_data.html" class="code" title="function generate_random_foci_data(directory_name,output_dir_name,random_nuclear_foci,input_params)">generate_random_foci_data</a>	Function that reads in FISH, IF, and random nuclear spot files to generate output centered on</li><li><a href="slices_of_relevant_images.html" class="code" title="function slices_of_relevant_images(directory_name,output_dir_name,input_params)">slices_of_relevant_images</a>	Function that reads in FISH and IF files to generate output centered on</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function generate_IRF_collapse_plot(FISH_IRF,IF_IRF,ind_flag,figure_name)</a>
+0002 <span class="comment">% Generates IRF plots</span>
+0003 <span class="comment">%   Function takes in FISH, IF IRF data inputs, as well as flag to plot</span>
+0004 <span class="comment">%   individual IRF lines. The figure is saved with figure_name</span>
+0005 figure;
+0006 set(gcf, <span class="string">'Visible'</span>, <span class="string">'on'</span>);
+0007 
+0008 subplot(2,1,1);
+0009 dist =[];
+0010 mean_FISH = [];
+0011 mean_IF =[];
+0012 <span class="keyword">for</span> k =1:1:length(FISH_IRF)
+0013     <span class="keyword">if</span> ind_flag
+0014         plot(smooth(FISH_IRF{k}.dist,15),smooth(FISH_IRF{k}.intensity,15),<span class="string">'LineWidth'</span>,0.25,<span class="string">'Color'</span>,[0.25 0 0]) ; hold on;
+0015     <span class="keyword">end</span>
+0016     mean_FISH = [mean_FISH smooth(FISH_IRF{k}.intensity,15)]; 
+0017 
+0018 <span class="keyword">end</span>
+0019 mean_FISH = mean(mean_FISH,2);
+0020 plot(smooth(FISH_IRF{k}.dist,15), mean_FISH,<span class="string">'LineWidth'</span>,4,<span class="string">'Color'</span>,[1 0 0]);
+0021 subplot(2,1,2);
+0022 <span class="keyword">for</span> k =1:1:length(FISH_IRF)
+0023     <span class="keyword">if</span> ind_flag
+0024         plot(smooth(FISH_IRF{k}.dist,15),smooth(IF_IRF{k}.intensity,15),<span class="string">'LineWidth'</span>,0.25,<span class="string">'Color'</span>,[0 0.25 0]) ; hold on;
+0025     <span class="keyword">end</span>
+0026     mean_IF = [mean_IF smooth(IF_IRF{k}.intensity,15)]; 
+0027     
+0028 <span class="keyword">end</span>
+0029 mean_IF = mean(mean_IF,2);
+0030 plot(smooth(FISH_IRF{k}.dist,15), mean_IF,<span class="string">'LineWidth'</span>,4,<span class="string">'Color'</span>,[0 1 0]);
+0031 
+0032 set(gcf, <span class="string">'Position'</span>, get(0, <span class="string">'Screensize'</span>));
+0033 
+0034 C1 =corrcoef(mean_FISH,mean_IF);
+0035 disp([<span class="string">'Correlation coefficient for FISH and IF is'</span> num2str(C1(1,2))]);    
+0036 
+0037 <span class="comment">% saveas(gcf,[figure_name '.fig']);</span>
+0038 <span class="comment">% saveas(gcf,[figure_name '.svg']);</span>
+0039 
+0040 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 11-Mar-2019 16:08:27 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

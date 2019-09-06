@@ -1,0 +1,234 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of params</title>
+  <meta name="keywords" content="params">
+  <meta name="description" content="Parametrizes input with typical image-analysis parameters">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">FISH_IF_colocalization</a> &gt; params.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for FISH_IF_colocalization&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>params
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Parametrizes input with typical image-analysis parameters</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function params(directory_name,output_dir_name,in_params) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">   Parametrizes input with typical image-analysis parameters
+   Certain parameters and flag variables can be set within this
+   function. The list is:
+       o threshold_multiplier - Multiplicative threshold for intensity
+       thresholding
+       o FISH_threshold - Minimum area (in pixels) for thresholding
+       o xpixel - Pixel length (um) along x/y directions
+       o zpixel - Pixel length (um) along z stack
+       o distance_threshold - Pixel displacement (um) across z-stacks of
+       centroid that is permissible for stitching
+       o automatically_call_foci - Flag variable that decides whether (1)
+       or not (0) automatic foci detection should happen. Default setting
+       is ON (1).
+       o curate_called_foci - Flag variable that decides whether (1)
+       or not (0) automatically called foci are curated across a manually
+       provided csv list of foci. Default setting is OFF (0).
+       o volume_threshold - Minimum volume (um^3) for accepting foci.
+       Default setting is 0.05 um^3 &lt;-- experience for FISH data in mESCs.
+       o size_box - Half length of box around FISH centroid (in pixels)
+       for which the IF data is gathered. Default is 25 pixels ~ 1.5 um.
+       o random_auto_call - Flag variable that decides whether (1)
+       or not (0) to call random foci based on DAPI channel data. Default
+       setting is ON (1) - requires 405 channel image data.
+
+
+   This function completely parametrizes the KEY variable - input_params,
+   which is used to peform the image-colocalization analysis. The
+   function does not return any data - instead generating all the key
+   output files under the output_dir_name.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="../FISH_IF_colocalization/source_files/auto_call_random_foci.html" class="code" title="function [] = auto_call_random_foci(directory_name,random_foci_dir,input_params)">auto_call_random_foci</a>	Function calls randomly located centroid position within nuclei,</li><li><a href="../FISH_IF_colocalization/source_files/generate_random_foci_data.html" class="code" title="function generate_random_foci_data(directory_name,output_dir_name,random_nuclear_foci,input_params)">generate_random_foci_data</a>	Function that reads in FISH, IF, and random nuclear spot files to generate output centered on</li><li><a href="../FISH_IF_colocalization/source_files/production_average_images.html" class="code" title="function production_average_images(Image_store,Fish_store,Random_store,figure_name,IF_name,FISH_name,FISH_color,IF_color,stack_range)">production_average_images</a>	Produce "production" quality FISH-IF plots from input data</li><li><a href="../FISH_IF_colocalization/source_files/production_quality_IRF.html" class="code" title="function production_quality_IRF(FISH_IRF,IF_IRF,Random_IRF,ind_flag,figure_name,FISH_name,IF_name,FISH_color,IF_color)">production_quality_IRF</a>	Produce "production" quality IRF plots from input data</li><li><a href="../FISH_IF_colocalization/source_files/save_foci_data_post_analysis.html" class="code" title="function []= save_foci_data_post_analysis(real_data_location,params)">save_foci_data_post_analysis</a>	Analysis function that saves foci_data post output data generation</li><li><a href="../FISH_IF_colocalization/source_files/slices_of_relevant_images.html" class="code" title="function slices_of_relevant_images(directory_name,output_dir_name,input_params)">slices_of_relevant_images</a>	Function that reads in FISH and IF files to generate output centered on</li><li><a href="../FISH_IF_colocalization/source_files/utils/normalized_data_collection.html" class="code" title="function [] = normalized_data_collection(directory_name,output_file,input_params)">normalized_data_collection</a>	</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="call_3Danalysis_code.html" class="code" title="">call_3Danalysis_code</a>	Runs 3D FISH-IF colocalization upon user-defined input</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%   Parametrizes input with typical image-analysis parameters</span>
+0002 <span class="comment">%   Certain parameters and flag variables can be set within this</span>
+0003 <span class="comment">%   function. The list is:</span>
+0004 <span class="comment">%       o threshold_multiplier - Multiplicative threshold for intensity</span>
+0005 <span class="comment">%       thresholding</span>
+0006 <span class="comment">%       o FISH_threshold - Minimum area (in pixels) for thresholding</span>
+0007 <span class="comment">%       o xpixel - Pixel length (um) along x/y directions</span>
+0008 <span class="comment">%       o zpixel - Pixel length (um) along z stack</span>
+0009 <span class="comment">%       o distance_threshold - Pixel displacement (um) across z-stacks of</span>
+0010 <span class="comment">%       centroid that is permissible for stitching</span>
+0011 <span class="comment">%       o automatically_call_foci - Flag variable that decides whether (1)</span>
+0012 <span class="comment">%       or not (0) automatic foci detection should happen. Default setting</span>
+0013 <span class="comment">%       is ON (1).</span>
+0014 <span class="comment">%       o curate_called_foci - Flag variable that decides whether (1)</span>
+0015 <span class="comment">%       or not (0) automatically called foci are curated across a manually</span>
+0016 <span class="comment">%       provided csv list of foci. Default setting is OFF (0).</span>
+0017 <span class="comment">%       o volume_threshold - Minimum volume (um^3) for accepting foci.</span>
+0018 <span class="comment">%       Default setting is 0.05 um^3 &lt;-- experience for FISH data in mESCs.</span>
+0019 <span class="comment">%       o size_box - Half length of box around FISH centroid (in pixels)</span>
+0020 <span class="comment">%       for which the IF data is gathered. Default is 25 pixels ~ 1.5 um.</span>
+0021 <span class="comment">%       o random_auto_call - Flag variable that decides whether (1)</span>
+0022 <span class="comment">%       or not (0) to call random foci based on DAPI channel data. Default</span>
+0023 <span class="comment">%       setting is ON (1) - requires 405 channel image data.</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">%</span>
+0026 <span class="comment">%   This function completely parametrizes the KEY variable - input_params,</span>
+0027 <span class="comment">%   which is used to peform the image-colocalization analysis. The</span>
+0028 <span class="comment">%   function does not return any data - instead generating all the key</span>
+0029 <span class="comment">%   output files under the output_dir_name.</span>
+0030 
+0031 <a name="_sub0" href="#_subfunctions" class="code">function params(directory_name,output_dir_name,in_params)</a>
+0032 
+0033 input_params = [];
+0034 
+0035 <span class="comment">%   Flag dictates which internal threshold to employ</span>
+0036 <span class="comment">%   Use threshold specified below</span>
+0037 input_params.flag = 1;
+0038 
+0039 <span class="keyword">if</span> isempty(in_params)
+0040     input_params.FISH = <span class="string">'561'</span>;
+0041     input_params.IF = <span class="string">'488'</span>;
+0042     
+0043     input_params.FISH_name = <span class="string">'mir290'</span>;
+0044     input_params.IF_name = <span class="string">'med1'</span>;
+0045 <span class="keyword">else</span>
+0046     input_params.FISH = in_params.FISH_channel;
+0047     input_params.IF = in_params.IF_channel;
+0048     
+0049     input_params.FISH_name = in_params.FISH_name;
+0050     input_params.IF_name = in_params.IF_name;
+0051 <span class="keyword">end</span>
+0052 
+0053 <span class="comment">%   Passed minimum intensity multiplier and area (pixel^2)</span>
+0054 <span class="comment">%   threshold for FISH</span>
+0055 
+0056 input_params.threshold_multiplier = 2.0;
+0057 input_params.FISH_threshold = 12.0;
+0058 
+0059 <span class="comment">%   um pixel resolution for microscope</span>
+0060 
+0061 input_params.xpixel = 0.0572;
+0062 input_params.zpixel = 0.2;
+0063 
+0064 <span class="comment">%   This is the distance threshold for centroid stitching across multiple</span>
+0065 <span class="comment">%   z-stacks ( in um )</span>
+0066 input_params.distance_threshold = 0.75;
+0067 
+0068 <span class="comment">%   Setting automatically_call_foci =1 allows the code to call FISH foci, and</span>
+0069 <span class="comment">%   setting it to 0 turns off automated foci calling</span>
+0070 input_params.automatically_call_foci = 1;
+0071 
+0072 <span class="comment">%   Setting curate_called_foci=1 curates the automatically called foci with</span>
+0073 <span class="comment">%   the manually called foci stored in files stored under</span>
+0074 <span class="comment">%   'C:\.....\mir290_brd4\$CSV_FOLDER', where csv_folder is the folder with</span>
+0075 <span class="comment">%   called foci files that is defined below. Setting curate_called_foci=0</span>
+0076 <span class="comment">%   does not curate the called data.</span>
+0077 
+0078 input_params.curate_called_foci = 0;
+0079 
+0080 <span class="comment">%   Volumetric threshold for accepting a called FISH foci, in units of um^3</span>
+0081 input_params.volume_threshold = 0.05;
+0082 
+0083 <span class="comment">%   csv_folder points to the folder at 'C:\.....\mir290_brd4\csv_folder\'</span>
+0084 <span class="comment">%   where the files for manually called foci are stored.</span>
+0085 input_params.csv_folder = <span class="string">'Foci_calls'</span>;
+0086 input_params.csv_folder = [fileparts(fileparts(directory_name)) <span class="string">'/'</span> input_params.csv_folder <span class="string">'/'</span>];
+0087 
+0088 <span class="comment">%   This is the half the length of the cube of image data that is stored,</span>
+0089 <span class="comment">%   centered on the centroid of the FISH foci. In units of xy pixels. The</span>
+0090 <span class="comment">%   size of the z plane is calculated as (size_box)* (x_pixel)/(z_pixel).</span>
+0091 input_params.size_box = 25;
+0092 
+0093 input_params.ind_flag = 0;
+0094 
+0095 
+0096 <span class="comment">%   This is the name of the folder under which the randomly called foci</span>
+0097 <span class="comment">%   centroids are stored.'C:\.....\mir290_brd4\$random_nuclear_foci'.</span>
+0098 random_nuclear_foci = <span class="string">'Random_foci'</span>;
+0099 
+0100 <span class="comment">%   Auto call random foci- suite still under development</span>
+0101 input_params.random_auto_call = 1;
+0102 
+0103 output_dir_name = [ output_dir_name <span class="string">'_size_box_'</span> num2str(input_params.size_box) ];
+0104 
+0105 <span class="comment">%File-name for Nuclear-IF signal</span>
+0106 nuclear_out_file = [fileparts(fileparts(directory_name)) <span class="string">'/'</span> output_dir_name <span class="string">'/nuclear_IF_average.csv'</span>];
+0107 <a href="../FISH_IF_colocalization/source_files/utils/normalized_data_collection.html" class="code" title="function [] = normalized_data_collection(directory_name,output_file,input_params)">normalized_data_collection</a>(directory_name,nuclear_out_file,input_params);
+0108 
+0109 <span class="comment">%   This calls the functions where the majority of analysis calculations</span>
+0110 <span class="comment">%   take place.</span>
+0111 <a href="../FISH_IF_colocalization/source_files/slices_of_relevant_images.html" class="code" title="function slices_of_relevant_images(directory_name,output_dir_name,input_params)">slices_of_relevant_images</a>(directory_name,output_dir_name,input_params);
+0112 
+0113 <span class="comment">% If the random foci are called and stored in the folder, then the function</span>
+0114 <span class="comment">% will call the random foci analysis.</span>
+0115 random_exist = isdir([fileparts(fileparts(directory_name)) <span class="string">'/'</span> random_nuclear_foci <span class="string">'/'</span>]);
+0116 <span class="keyword">if</span> random_exist
+0117     output_random_dir_name = [ output_dir_name <span class="string">'_random'</span>];
+0118     <a href="../FISH_IF_colocalization/source_files/generate_random_foci_data.html" class="code" title="function generate_random_foci_data(directory_name,output_dir_name,random_nuclear_foci,input_params)">generate_random_foci_data</a>(directory_name,output_random_dir_name,random_nuclear_foci,input_params)
+0119 
+0120 <span class="keyword">elseif</span> input_params.random_auto_call
+0121     random_foci_dir = [fileparts(fileparts(directory_name)) <span class="string">'/'</span> random_nuclear_foci <span class="string">'_auto/'</span>];
+0122     <span class="keyword">if</span> ~isdir(random_foci_dir)
+0123         mkdir([fileparts(fileparts(directory_name)) <span class="string">'/'</span> random_nuclear_foci <span class="string">'_auto/'</span>]);
+0124         <a href="../FISH_IF_colocalization/source_files/auto_call_random_foci.html" class="code" title="function [] = auto_call_random_foci(directory_name,random_foci_dir,input_params)">auto_call_random_foci</a>(directory_name,random_foci_dir,input_params);
+0125     <span class="keyword">end</span>
+0126     output_random_dir_name = [ output_dir_name <span class="string">'_random'</span>];
+0127     <a href="../FISH_IF_colocalization/source_files/generate_random_foci_data.html" class="code" title="function generate_random_foci_data(directory_name,output_dir_name,random_nuclear_foci,input_params)">generate_random_foci_data</a>(directory_name,output_random_dir_name,[random_nuclear_foci <span class="string">'_auto/'</span>],input_params)
+0128 
+0129 <span class="keyword">end</span>
+0130 <span class="comment">%% In this section, once the raw data is generated and stored, production quality images</span>
+0131 <span class="comment">%% are generated and saved in the output_directory with RED for FISH and green for IF.</span>
+0132 real_data_loc = [fileparts(fileparts(directory_name)) <span class="string">'/'</span> output_dir_name  <span class="string">'/Combined_data/Total_data.mat'</span>];
+0133 <span class="comment">%   Saves important foci statistics</span>
+0134 <a href="../FISH_IF_colocalization/source_files/save_foci_data_post_analysis.html" class="code" title="function []= save_foci_data_post_analysis(real_data_location,params)">save_foci_data_post_analysis</a>(real_data_loc,input_params);
+0135 
+0136 FISH_color = [1 0 0];
+0137 IF_color = [0 1 0];
+0138 RD = load(real_data_loc);
+0139 z_stack_center = ceil(size(RD.FISH_data{1},3)/2);
+0140 name = [fileparts(real_data_loc) <span class="string">'/'</span>  input_params.FISH_name <span class="string">'_'</span> input_params.IF_name <span class="string">'_production_average_image'</span>];
+0141 figure_name = [fileparts(real_data_loc) <span class="string">'/'</span>   input_params.FISH_name <span class="string">'_'</span> input_params.IF_name <span class="string">'_production_IRF_image'</span>];
+0142 
+0143 <span class="keyword">if</span> ((~random_exist) &amp;&amp; (~input_params.random_auto_call))
+0144     <a href="../FISH_IF_colocalization/source_files/production_average_images.html" class="code" title="function production_average_images(Image_store,Fish_store,Random_store,figure_name,IF_name,FISH_name,FISH_color,IF_color,stack_range)">production_average_images</a>(RD.IF_data,RD.FISH_data,[],name,input_params.IF_name,input_params.FISH_name,FISH_color,IF_color,[z_stack_center-5,z_stack_center+5])
+0145     <a href="../FISH_IF_colocalization/source_files/production_quality_IRF.html" class="code" title="function production_quality_IRF(FISH_IRF,IF_IRF,Random_IRF,ind_flag,figure_name,FISH_name,IF_name,FISH_color,IF_color)">production_quality_IRF</a>(RD.FISH_IRF,RD.IF_IRF,[],0,figure_name,input_params.FISH_name,input_params.IF_name,FISH_color,IF_color)
+0146 
+0147 <span class="keyword">else</span>
+0148     random_data_loc = [fileparts(fileparts(directory_name)) <span class="string">'/'</span> output_random_dir_name  <span class="string">'/Combined_data/Total_data.mat'</span>];
+0149     <a href="../FISH_IF_colocalization/source_files/save_foci_data_post_analysis.html" class="code" title="function []= save_foci_data_post_analysis(real_data_location,params)">save_foci_data_post_analysis</a>(random_data_loc,input_params);
+0150 
+0151     Random_store =load(random_data_loc); 
+0152     <a href="../FISH_IF_colocalization/source_files/production_average_images.html" class="code" title="function production_average_images(Image_store,Fish_store,Random_store,figure_name,IF_name,FISH_name,FISH_color,IF_color,stack_range)">production_average_images</a>(RD.IF_data,RD.FISH_data,Random_store.IF_data,name,input_params.IF_name,input_params.FISH_name,FISH_color,IF_color,[z_stack_center-6,z_stack_center+6])
+0153     <a href="../FISH_IF_colocalization/source_files/production_quality_IRF.html" class="code" title="function production_quality_IRF(FISH_IRF,IF_IRF,Random_IRF,ind_flag,figure_name,FISH_name,IF_name,FISH_color,IF_color)">production_quality_IRF</a>(RD.FISH_IRF,RD.IF_IRF,Random_store.IF_IRF,0,figure_name,input_params.FISH_name,input_params.IF_name,FISH_color,IF_color)
+0154 
+0155 
+0156 <span class="keyword">end</span>
+0157 
+0158 
+0159 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 11-Mar-2019 16:08:27 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

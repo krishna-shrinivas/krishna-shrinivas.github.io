@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of normalized_data_collection</title>
+  <meta name="keywords" content="normalized_data_collection">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">FISH_IF_colocalization</a> &gt; <a href="../index.html">source_files</a> &gt; <a href="index.html">utils</a> &gt; normalized_data_collection.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for FISH_IF_colocalization/source_files/utils&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>normalized_data_collection
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function [] = normalized_data_collection(directory_name,output_file,input_params) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="nuclear_signal_estimate.html" class="code" title="function[IF_mean] = nuclear_signal_estimate(filename,IF_file)">nuclear_signal_estimate</a>	</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="../../../FISH_IF_colocalization/params.html" class="code" title="function params(directory_name,output_dir_name,in_params)">params</a>	Parametrizes input with typical image-analysis parameters</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [] = normalized_data_collection(directory_name,output_file,input_params)</a>
+0002 
+0003 
+0004 p=dir(directory_name);
+0005 subdir = {};
+0006 
+0007 <span class="comment">%Pixel parameters</span>
+0008 xpixel = input_params.xpixel;
+0009 zpixel = input_params.zpixel;
+0010 
+0011 <span class="comment">%   Stores DNA FISH + IF for nuclear counting parameters</span>
+0012 <span class="keyword">for</span> i=3:1:length(p)
+0013     subdir{i-2} = [directory_name p(i).name <span class="string">'/'</span>];
+0014     <span class="keyword">if</span> isdir(subdir{i-2})
+0015         uniq_folder_id{i-2} = p(i).name(end-1:end);
+0016         local_files  = dir(subdir{i-2});
+0017         <span class="keyword">for</span> j=3:1:length(local_files)
+0018             <span class="keyword">if</span> strfind(local_files(j).name,<span class="string">'405'</span>)
+0019                 DNA_channel{i-2} =[subdir{i-2} local_files(j).name];
+0020             <span class="keyword">end</span>
+0021             <span class="keyword">if</span> strfind(local_files(j).name,<span class="string">'488'</span>)
+0022                 IF_channel{i-2} = [subdir{i-2} local_files(j).name];
+0023             <span class="keyword">end</span>
+0024         <span class="keyword">end</span>
+0025 
+0026         IF_mean{i-2} = <a href="nuclear_signal_estimate.html" class="code" title="function[IF_mean] = nuclear_signal_estimate(filename,IF_file)">nuclear_signal_estimate</a>(DNA_channel{i-2},IF_channel{i-2});
+0027         
+0028     <span class="keyword">end</span>
+0029 <span class="keyword">end</span>
+0030 all_data = [IF_channel' IF_mean'];
+0031 T = cell2table(all_data);
+0032 T.Properties.VariableNames = {<span class="string">'Image_file'</span>,<span class="string">'Average_IF'</span>};
+0033 
+0034 <span class="keyword">if</span> ~exist((fileparts(output_file)), <span class="string">'dir'</span>) &amp;&amp; ~isempty((fileparts(output_file)))
+0035     mkdir((fileparts(output_file)));
+0036 <span class="keyword">end</span>
+0037 writetable(T, output_file);
+0038 
+0039 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 11-Mar-2019 16:08:27 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of write_foci_tiff_image</title>
+  <meta name="keywords" content="write_foci_tiff_image">
+  <meta name="description" content="Write individual foci into a long TIFF file">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="../index.html">FISH_IF_colocalization</a> &gt; <a href="index.html">source_files</a> &gt; write_foci_tiff_image.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for FISH_IF_colocalization/source_files&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>write_foci_tiff_image
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Write individual foci into a long TIFF file</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function write_foci_tiff_image(FISH_data,IF_data,output_file_IF,output_file_FISH) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">   Write individual foci into a long TIFF file</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function write_foci_tiff_image(FISH_data,IF_data,output_file_IF,output_file_FISH)</a>
+0002 
+0003 <span class="comment">%   Write individual foci into a long TIFF file</span>
+0004 mean_FISH = FISH_data{1};
+0005 mean_IF = IF_data{1};
+0006 <span class="keyword">for</span> i=2:1:size(FISH_data,2)
+0007     mean_FISH = mean_FISH + FISH_data{i};
+0008     mean_IF = mean_IF + IF_data{i};
+0009 <span class="keyword">end</span>
+0010 
+0011 mean_FISH = mean_FISH/size(FISH_data,2);
+0012 mean_IF = mean_IF/size(IF_data,2);
+0013 
+0014 imwrite(mean_FISH(:,:,1),output_file_FISH);
+0015 imwrite(mean_IF(:,:,1),output_file_IF);
+0016 
+0017 <span class="keyword">for</span> j=2:1:size(FISH_data{i},3)
+0018     imwrite(mean_FISH(:,:,j),output_file_FISH,<span class="string">'WriteMode'</span>,<span class="string">'append'</span>);
+0019     imwrite(mean_IF(:,:,j),output_file_IF,<span class="string">'WriteMode'</span>,<span class="string">'append'</span>);
+0020 <span class="keyword">end</span>
+0021 
+0022 
+0023 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 11-Mar-2019 16:08:27 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

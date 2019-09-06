@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of auto_call_random_foci</title>
+  <meta name="keywords" content="auto_call_random_foci">
+  <meta name="description" content="Function calls randomly located centroid position within nuclei,">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="../index.html">FISH_IF_colocalization</a> &gt; <a href="index.html">source_files</a> &gt; auto_call_random_foci.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for FISH_IF_colocalization/source_files&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>auto_call_random_foci
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Function calls randomly located centroid position within nuclei,</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [] = auto_call_random_foci(directory_name,random_foci_dir,input_params) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">   Function calls randomly located centroid position within nuclei,
+   identified by the DAPI channel.
+   Input parameters to the function are:
+       o directory_name - link to /.../images
+       o random_foci_dir - Output directory where called foci are written,
+       typically '/...../Random_foci_auto'
+       o input_params - Input parameters - refer params.m for more info.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="cell_classifier_DNA.html" class="code" title="function[] = cell_classifier_DNA(filename,output_file,input_params,N_rand)">cell_classifier_DNA</a>	Function that takes in a DAPI-channel to identify nuclei.</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../FISH_IF_colocalization/params.html" class="code" title="function params(directory_name,output_dir_name,in_params)">params</a>	Parametrizes input with typical image-analysis parameters</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [] = auto_call_random_foci(directory_name,random_foci_dir,input_params)</a>
+0002 <span class="comment">%   Function calls randomly located centroid position within nuclei,</span>
+0003 <span class="comment">%   identified by the DAPI channel.</span>
+0004 <span class="comment">%   Input parameters to the function are:</span>
+0005 <span class="comment">%       o directory_name - link to /.../images</span>
+0006 <span class="comment">%       o random_foci_dir - Output directory where called foci are written,</span>
+0007 <span class="comment">%       typically '/...../Random_foci_auto'</span>
+0008 <span class="comment">%       o input_params - Input parameters - refer params.m for more info.</span>
+0009 
+0010 p=dir(directory_name);
+0011 subdir = {};
+0012 
+0013 <span class="comment">%   Pixel parameters</span>
+0014 xpixel = input_params.xpixel;
+0015 zpixel = input_params.zpixel;
+0016 
+0017 <span class="comment">%   Stores DNA FISH parameters</span>
+0018 <span class="keyword">for</span> i=3:1:length(p)
+0019     subdir{i-2} = [directory_name p(i).name <span class="string">'/'</span>];
+0020     <span class="keyword">if</span> isdir(subdir{i-2})
+0021         uniq_folder_id{i-2} = p(i).name(end-1:end);
+0022         local_files  = dir(subdir{i-2});
+0023         <span class="keyword">for</span> j=3:1:length(local_files)
+0024             <span class="keyword">if</span> strfind(local_files(j).name,<span class="string">'405'</span>)
+0025                 DNA_channel{i-2} =[subdir{i-2} local_files(j).name];
+0026                 output_DNA_file{i-2} = [ random_foci_dir <span class="string">'auto_called_random_foci_'</span> uniq_folder_id{i-2}];
+0027             <span class="keyword">end</span>
+0028         <span class="keyword">end</span>
+0029         <a href="cell_classifier_DNA.html" class="code" title="function[] = cell_classifier_DNA(filename,output_file,input_params,N_rand)">cell_classifier_DNA</a>(DNA_channel{i-2},output_DNA_file{i-2},input_params,40);
+0030         
+0031     <span class="keyword">end</span>
+0032 <span class="keyword">end</span>
+0033 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 11-Mar-2019 16:08:27 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

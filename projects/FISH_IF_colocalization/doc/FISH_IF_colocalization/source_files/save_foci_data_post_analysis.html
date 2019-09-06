@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of save_foci_data_post_analysis</title>
+  <meta name="keywords" content="save_foci_data_post_analysis">
+  <meta name="description" content="Analysis function that saves foci_data post output data generation">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="../index.html">FISH_IF_colocalization</a> &gt; <a href="index.html">source_files</a> &gt; save_foci_data_post_analysis.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for FISH_IF_colocalization/source_files&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>save_foci_data_post_analysis
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Analysis function that saves foci_data post output data generation</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function []= save_foci_data_post_analysis(real_data_location,params) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">   Analysis function that saves foci_data post output data generation</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../FISH_IF_colocalization/params.html" class="code" title="function params(directory_name,output_dir_name,in_params)">params</a>	Parametrizes input with typical image-analysis parameters</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function []= save_foci_data_post_analysis(real_data_location,params)</a>
+0002 <span class="comment">%   Analysis function that saves foci_data post output data generation</span>
+0003 
+0004 RD = load(real_data_location);
+0005 [output_dir_name,b] =fileparts(real_data_location);
+0006 
+0007 center = ceil(size(RD.FISH_data{1})/2);
+0008 xy_drift = 3;
+0009 z_drift = 1;
+0010 count = (2*xy_drift+1)*(2*xy_drift+1)*(2*z_drift+1);
+0011 average_intensity_roi = zeros(length(RD.FISH_data),2);
+0012 file_names ={};
+0013 <span class="keyword">for</span> foci = 1:1:length(RD.FISH_data)
+0014     
+0015     <span class="keyword">for</span> p=xy_drift*-1:1:xy_drift
+0016         <span class="keyword">for</span> q=xy_drift*-1:1:xy_drift
+0017             
+0018             <span class="keyword">for</span> r =z_drift*-1:1:z_drift
+0019                 average_intensity_roi(foci,1) = average_intensity_roi(foci,1)+ double(RD.FISH_data{foci}(center(1)+p,center(2)+q,center(3)+r));
+0020                 average_intensity_roi(foci,2) = average_intensity_roi(foci,2) + double(RD.IF_data{foci}(center(1)+p,center(2)+q,center(3)+r));
+0021                 
+0022             <span class="keyword">end</span>
+0023         <span class="keyword">end</span>
+0024     <span class="keyword">end</span>
+0025     file_names{foci} =<span class="string">''</span>;
+0026     [c,file_names{foci}]=fileparts(RD.image_data_set{foci});
+0027 <span class="keyword">end</span>
+0028 
+0029 average_intensity_roi = average_intensity_roi/count;
+0030 <span class="comment">%         corrcoef(average_intensity_roi(:,2),average_intensity_roi(:,3))</span>
+0031 
+0032 output_data = [];
+0033 output_data(:,1:3) = RD.COM_data(:,1:3);
+0034 output_data(:,1:2) =output_data(:,1:2) * params.xpixel;
+0035 output_data(:,3) =output_data(:,3) * params.zpixel;
+0036 
+0037 output_data(:,4:5) = average_intensity_roi;
+0038 T = array2table(output_data);
+0039 T(:,6) = array2table(file_names');
+0040 T.Properties.VariableNames ={<span class="string">'X_center'</span>,<span class="string">'Y_center'</span>,<span class="string">'Z_center'</span>,<span class="string">'Average_FISH'</span>,<span class="string">'Average_IF'</span>, <span class="string">'Experimental_image_file'</span>};
+0041 
+0042 output_file = [output_dir_name <span class="string">'/'</span> params.FISH_name <span class="string">'_'</span> params.IF_name <span class="string">'_foci_statistics.csv'</span>];
+0043 writetable(T,output_file);
+0044 close all;
+0045 <span class="comment">%         generate_threshold_plot(RDM.FISH_data,RDM.IF_data,[0 26],0,[21 21]);</span>
+0046 <span class="comment">%         output_image_name = [FISH_name '_med1_all_foci.svg'];</span>
+0047 <span class="comment">%         saveas(gcf,output_image_name);</span>
+0048 <span class="comment">%         close all;</span>
+0049 
+0050 time_to_complete = toc;
+0051 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 11-Mar-2019 16:08:27 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

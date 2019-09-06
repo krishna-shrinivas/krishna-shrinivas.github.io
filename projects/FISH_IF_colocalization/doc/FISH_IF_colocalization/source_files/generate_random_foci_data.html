@@ -1,0 +1,270 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of generate_random_foci_data</title>
+  <meta name="keywords" content="generate_random_foci_data">
+  <meta name="description" content="Function that reads in FISH, IF, and random nuclear spot files to generate output centered on">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="../index.html">FISH_IF_colocalization</a> &gt; <a href="index.html">source_files</a> &gt; generate_random_foci_data.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for FISH_IF_colocalization/source_files&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>generate_random_foci_data
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Function that reads in FISH, IF, and random nuclear spot files to generate output centered on</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function generate_random_foci_data(directory_name,output_dir_name,random_nuclear_foci,input_params) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">   Function that reads in FISH, IF, and random nuclear spot files to generate output centered on
+   on various *random* FISH foci and saves all the captured foci, as well as the IF
+   information in all the stacks for any given FISH foci
+
+   The various parameters are
+
+       directory_name ==   directory under which the files are stored under
+                           with each replicate under a different subfolder
+
+       output_dir_name ==  directory to which output files are written
+                           In particular, the there will be a separate
+                           subfolder for each replicate and one labeled
+                           'Combined_data' with all data together. Within
+                           each replicate folder, there will be many
+                           sub-folders:
+                               Data - Foci calls and MATLAB data
+                               Images_offset_x -  Average images z-offset by
+                                                  x slices b/w FISH &amp; IF
+                               IRF_offset_x -     IRF of average images
+                                                  with _av_0 for &lt;IRF&gt; and
+                                                  _av_1 IRF of &lt;image&gt;
+
+       random_nuclear_foci ==  Folder with random nuclear foci</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="convert_3D_image_IRF.html" class="code" title="function [IRF] = convert_3D_image_IRF(Data,input_params)">convert_3D_image_IRF</a>	Converts 3D matrix of image data into a 1D radial function about centroid</li><li><a href="generate_IRF_collapse_plot.html" class="code" title="function generate_IRF_collapse_plot(FISH_IRF,IF_IRF,ind_flag,figure_name)">generate_IRF_collapse_plot</a>	Generates IRF plots</li><li><a href="generate_average_images.html" class="code" title="function [Rand_protein,Rand_IF] = generate_average_images(Image_store,Fish_store,figure_name,IF_name,FISH_name)">generate_average_images</a>	Generates average projection FISH/IF plots</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../FISH_IF_colocalization/params.html" class="code" title="function params(directory_name,output_dir_name,in_params)">params</a>	Parametrizes input with typical image-analysis parameters</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%   Function that reads in FISH, IF, and random nuclear spot files to generate output centered on</span>
+0002 <span class="comment">%   on various *random* FISH foci and saves all the captured foci, as well as the IF</span>
+0003 <span class="comment">%   information in all the stacks for any given FISH foci</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%   The various parameters are</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%       directory_name ==   directory under which the files are stored under</span>
+0008 <span class="comment">%                           with each replicate under a different subfolder</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%       output_dir_name ==  directory to which output files are written</span>
+0011 <span class="comment">%                           In particular, the there will be a separate</span>
+0012 <span class="comment">%                           subfolder for each replicate and one labeled</span>
+0013 <span class="comment">%                           'Combined_data' with all data together. Within</span>
+0014 <span class="comment">%                           each replicate folder, there will be many</span>
+0015 <span class="comment">%                           sub-folders:</span>
+0016 <span class="comment">%                               Data - Foci calls and MATLAB data</span>
+0017 <span class="comment">%                               Images_offset_x -  Average images z-offset by</span>
+0018 <span class="comment">%                                                  x slices b/w FISH &amp; IF</span>
+0019 <span class="comment">%                               IRF_offset_x -     IRF of average images</span>
+0020 <span class="comment">%                                                  with _av_0 for &lt;IRF&gt; and</span>
+0021 <span class="comment">%                                                  _av_1 IRF of &lt;image&gt;</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">%       random_nuclear_foci ==  Folder with random nuclear foci</span>
+0024 
+0025 <a name="_sub0" href="#_subfunctions" class="code">function generate_random_foci_data(directory_name,output_dir_name,random_nuclear_foci,input_params)</a>
+0026 
+0027 
+0028 <span class="comment">%Lists all sub-directories in the images folder which</span>
+0029 <span class="comment">% are characterise as Expt_no_1/Image_1, Expt_no/Image_2</span>
+0030 p=dir(directory_name);
+0031 subdir = {};
+0032 COM_data = [];
+0033 <span class="comment">%   Stores IF and FISH information different cells</span>
+0034 <span class="comment">%   for each separate replicate</span>
+0035 count = 1;
+0036 <span class="keyword">for</span> i=3:1:length(p)
+0037     
+0038     
+0039     subdir{i-2} = [directory_name p(i).name <span class="string">'/'</span>];
+0040     <span class="keyword">if</span> (isdir(subdir{i-2}) &amp;&amp; isempty(strfind(subdir{i-2},<span class="string">'.'</span>)))
+0041         
+0042         local_files  = dir(subdir{i-2});
+0043         <span class="keyword">for</span> j=3:1:length(local_files)
+0044             <span class="keyword">if</span> strfind(local_files(j).name,input_params.IF)
+0045                 IF_channel{count} =[subdir{i-2} local_files(j).name];
+0046                 uniq_folder_id{count} = p(i).name(end-1:end);
+0047             <span class="keyword">elseif</span> strfind(local_files(j).name,input_params.FISH)
+0048                 FISH_channel{count} =[subdir{i-2} local_files(j).name];
+0049 
+0050             <span class="keyword">end</span> 
+0051         <span class="keyword">end</span>
+0052         count= count+1;
+0053     <span class="keyword">end</span>
+0054 <span class="keyword">end</span>
+0055 
+0056 <span class="comment">%   Data structure that keeps track of all the foci across experiments</span>
+0057 overall_images = [];
+0058 
+0059 <span class="comment">%   Range of z-stack offsets from min_offset to max_offset</span>
+0060 max_offset = 0;
+0061 min_offset = 0;
+0062 offset_range = min_offset:1:max_offset;
+0063 
+0064 [outputdir filen]= fileparts(directory_name);
+0065 [parentFolder filen] =fileparts(outputdir);
+0066 gene_folder = parentFolder;
+0067 
+0068 
+0069 [temp pair_of_genes] = fileparts(parentFolder);
+0070 
+0071 FISH_name = input_params.FISH_name;
+0072 IF_name = input_params.IF_name;
+0073 
+0074 parentFolder = [parentFolder <span class="string">'/'</span> output_dir_name];
+0075 <span class="keyword">if</span> ~exist(parentFolder, <span class="string">'dir'</span>) &amp;&amp; ~isempty(parentFolder)
+0076     mkdir(parentFolder);
+0077 <span class="keyword">end</span>
+0078 overall_images.I = cell(max_offset-min_offset+1,1);
+0079 overall_images.S = cell(max_offset-min_offset+1,1);
+0080 overall_images.F = cell(max_offset-min_offset+1,1);
+0081 
+0082 image_data_set = {};
+0083 
+0084 foci_ac= 1;
+0085 
+0086 
+0087 xyumtopixelconversion = 1/input_params.xpixel;
+0088 zumtopixelconversion = 1/input_params.zpixel;
+0089 
+0090 xpixel = input_params.xpixel;
+0091 zpixel = input_params.zpixel;
+0092 
+0093 
+0094 <span class="comment">%% Store random foci data</span>
+0095 p = dir([gene_folder <span class="string">'/'</span> random_nuclear_foci]);
+0096 count = 1;
+0097 <span class="keyword">for</span> id=1:1:length(IF_channel)
+0098     i=3;
+0099     flag =0;
+0100     <span class="keyword">while</span> ((i&lt;=length(p)) &amp;&amp; (flag==0))
+0101         indx = strfind(p(i).name,uniq_folder_id{id});
+0102         indx2 = strfind(p(i).name,<span class="string">'txt'</span>);
+0103         <span class="comment">% to ensure that file has a txt in it</span>
+0104         <span class="keyword">if</span> (~isempty(indx) &amp;&amp; ~isempty(indx2))
+0105             curated_foci_name{id} = [gene_folder <span class="string">'/'</span> random_nuclear_foci <span class="string">'/'</span> p(i).name];
+0106             flag =1;
+0107         <span class="keyword">end</span>
+0108         i=i+1;
+0109     <span class="keyword">end</span>
+0110 <span class="keyword">end</span>
+0111 
+0112 
+0113 
+0114 <span class="keyword">for</span> file =1:1:length(IF_channel)
+0115     
+0116     randomly_called_foci{file} = csvread(curated_foci_name{file},1,1);
+0117     randomly_called_foci{file}(:,1:2) = randomly_called_foci{file}(:,1:2) * xyumtopixelconversion;
+0118     randomly_called_foci{file}(:,3) = randomly_called_foci{file}(:,3) * zumtopixelconversion;
+0119     randomly_called_foci{file} = floor(randomly_called_foci{file});
+0120     
+0121     n_images=numel(imfinfo(IF_channel{file}));
+0122     count =1;
+0123     Image_store = {};
+0124     Fish_store= [];
+0125     stats_relevant = [];
+0126     filename = IF_channel{file};
+0127     filename_FISH = FISH_channel{file};
+0128     
+0129     <span class="comment">% Reading all the IF and FISH images</span>
+0130     <span class="keyword">for</span> stack = 1:1:n_images
+0131         [X,map] = imread(filename,stack);
+0132         X_store{file,stack} =X;
+0133         
+0134         [XF,mapF] = imread(filename_FISH,stack);
+0135         XF_store{file,stack} = XF;
+0136         
+0137     <span class="keyword">end</span>
+0138     
+0139     
+0140     <span class="keyword">for</span> offset = 1:1:size(offset_range,2)
+0141         
+0142         
+0143         COM = [];
+0144         COM(:,1:2) = randomly_called_foci{file}(:,1:2);
+0145         COM(:,3) = randomly_called_foci{file}(:,3);
+0146         
+0147         size_box = input_params.size_box;
+0148         size_box_z = floor((size_box*xpixel)/zpixel);
+0149         <span class="keyword">for</span> foci = 1:1:size(COM,1)
+0150             Centroid = COM(foci,:);
+0151             stack_centroid = Centroid(3);
+0152             
+0153             
+0154             <span class="keyword">if</span> (stack_centroid - size_box_z &gt;1) &amp;&amp; (stack_centroid +size_box_z &lt; n_images - offset_range(offset))
+0155                 <span class="keyword">if</span> (floor(Centroid(1)) - size_box &gt;1) &amp;&amp; (floor(Centroid(1)) + size_box&lt;size(XF,1)) &amp;&amp; (floor(Centroid(2)) + size_box&lt;size(XF,1)) &amp;&amp; (floor(Centroid(2)) - size_box&gt;1)
+0156                     
+0157                     <span class="keyword">for</span> stack = 1:1:2*size_box_z +1
+0158                         FISH_data{foci_ac}(:,:,stack) = XF_store{file,stack_centroid -size_box_z -1+stack+offset_range(offset)}(floor(Centroid(2)) - size_box:floor(Centroid(2)) + size_box,floor(Centroid(1)) - size_box:floor(Centroid(1)) + size_box);
+0159                         IF_data{foci_ac}(:,:,stack) = X_store{file,stack_centroid -size_box_z -1+stack+offset_range(offset)}(floor(Centroid(2)) - size_box:floor(Centroid(2)) + size_box,floor(Centroid(1)) - size_box:floor(Centroid(1)) + size_box);
+0160                     <span class="keyword">end</span>
+0161                     [FISH_IRF{foci_ac}] = <a href="convert_3D_image_IRF.html" class="code" title="function [IRF] = convert_3D_image_IRF(Data,input_params)">convert_3D_image_IRF</a>(FISH_data{foci_ac},input_params);
+0162                     [IF_IRF{foci_ac}] = <a href="convert_3D_image_IRF.html" class="code" title="function [IRF] = convert_3D_image_IRF(Data,input_params)">convert_3D_image_IRF</a>(IF_data{foci_ac},input_params);
+0163                     image_data_set{foci_ac} = filename;
+0164                     COM_data(foci_ac,:) = COM(foci,:);
+0165                     foci_ac =foci_ac +1;
+0166                     
+0167                 <span class="keyword">end</span>
+0168             <span class="keyword">end</span>
+0169             
+0170         <span class="keyword">end</span>
+0171         
+0172     <span class="keyword">end</span>
+0173     
+0174     
+0175     
+0176     
+0177     
+0178     
+0179 <span class="keyword">end</span>
+0180 
+0181 
+0182 <span class="keyword">for</span> offset=1:1:size(offset_range,2)
+0183     raw_data = [parentFolder <span class="string">'/Combined_data/'</span> <span class="string">'All_data_'</span> num2str(offset_range(offset)) <span class="string">'.mat'</span>];
+0184     combined_IRF_figure = [parentFolder <span class="string">'/Combined_data/'</span> <span class="string">'All_IRF_'</span> num2str(offset_range(offset))];
+0185     combined_average_figure = [parentFolder <span class="string">'/Combined_data/'</span> <span class="string">'All_average_'</span> num2str(offset_range(offset))];
+0186     
+0187     [temp_parent,temp] =fileparts(raw_data);
+0188     <span class="keyword">if</span> ~exist(temp_parent, <span class="string">'dir'</span>) &amp;&amp; ~isempty(temp_parent)
+0189         mkdir(temp_parent);
+0190     <span class="keyword">end</span>
+0191     save([temp_parent <span class="string">'/Total_data.mat'</span>],<span class="string">'FISH_IRF'</span>,<span class="string">'IF_IRF'</span>,<span class="string">'FISH_data'</span>,<span class="string">'IF_data'</span>,<span class="string">'COM_data'</span>,<span class="string">'image_data_set'</span>,<span class="string">'input_params'</span>);
+0192     <a href="generate_IRF_collapse_plot.html" class="code" title="function generate_IRF_collapse_plot(FISH_IRF,IF_IRF,ind_flag,figure_name)">generate_IRF_collapse_plot</a>(FISH_IRF,IF_IRF,input_params.ind_flag,combined_IRF_figure)
+0193     <a href="generate_average_images.html" class="code" title="function [Rand_protein,Rand_IF] = generate_average_images(Image_store,Fish_store,figure_name,IF_name,FISH_name)">generate_average_images</a>(IF_data,FISH_data,combined_average_figure,IF_name,FISH_name)
+0194 <span class="keyword">end</span>
+0195 
+0196 
+0197 
+0198 
+0199 <span class="keyword">end</span>
+0200 <span class="comment">%</span>
+0201</pre></div>
+<hr><address>Generated on Mon 11-Mar-2019 16:08:27 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>
